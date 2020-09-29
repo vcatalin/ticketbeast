@@ -38,6 +38,7 @@ class ViewConcertListingTest extends DuskTestCase
                 ->assertSee('The Red Chord')
                 ->assertSee('with Animosity and Lethargy')
                 ->assertSee('December 13, 2020')
+                ->assertSee('8:00pm')
                 ->assertSee('32.50')
                 ->assertSee('The Mosh Pit')
                 ->assertSee('123 Example Lane')
