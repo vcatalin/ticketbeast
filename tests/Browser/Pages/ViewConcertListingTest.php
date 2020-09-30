@@ -17,7 +17,6 @@ class ViewConcertListingTest extends DuskTestCase
     /** @test */
     public function user_can_view_a_concert_listing(): void
     {
-        // Arrange
         $concert = Concert::create([
             'title' => 'The Red Chord',
             'subtitle' => 'with Animosity and Lethargy',
@@ -31,8 +30,6 @@ class ViewConcertListingTest extends DuskTestCase
             'additional_information' => 'For tickets, call (555) 555-5555.',
         ]);
 
-        // Act
-            // TODO: View the concert listing
         $this->browse(function (Browser $browser) use ($concert) {
             $browser->visit('/concerts/' . $concert->id)
                 ->assertSee('The Red Chord')
@@ -45,9 +42,5 @@ class ViewConcertListingTest extends DuskTestCase
                 ->assertSee('Laraville, ON 17916')
                 ->assertSee('For tickets, call (555) 555-5555.');
         });
-
-        // Assert
-            // TODO: See the concert details
-
     }
 }
