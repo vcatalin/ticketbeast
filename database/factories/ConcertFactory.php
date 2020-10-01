@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -31,5 +31,29 @@ class ConcertFactory extends Factory
             'zip' => '90210',
             'additional_information' => 'Some sample additional information',
         ];
+    }
+
+    /**
+     * Indicate that concert is published
+     */
+    public function published(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'published_at' => Carbon::parse('-2 weeks'),
+            ];
+        });
+    }
+
+    /**
+     * Indicate that concert is not published
+     */
+    public function unpublished(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'published_at' => null,
+            ];
+        });
     }
 }
