@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,5 +28,13 @@ class Concert extends Model
     public function getFormattedTicketPriceAttribute(): string
     {
         return number_format($this->ticket_price / 100, 2);
+    }
+
+    /**
+     * Scope a query to only published concerts.
+     */
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->whereNotNull('published_at');
     }
 }
