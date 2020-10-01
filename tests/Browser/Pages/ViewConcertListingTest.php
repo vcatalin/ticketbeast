@@ -9,6 +9,7 @@ use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Symfony\Component\HttpFoundation\Response;
 
 class ViewConcertListingTest extends DuskTestCase
 {
@@ -17,7 +18,8 @@ class ViewConcertListingTest extends DuskTestCase
     /** @test */
     public function user_can_view_a_concert_listing(): void
     {
-        $concert = Concert::create([
+        /** @var Concert */
+        $concert = Concert::factory()->create([
             'title' => 'The Red Chord',
             'subtitle' => 'with Animosity and Lethargy',
             'date' => Carbon::parse('December 13, 2020 8:00pm'),
@@ -28,6 +30,7 @@ class ViewConcertListingTest extends DuskTestCase
             'state' => 'ON',
             'zip' => '17916',
             'additional_information' => 'For tickets, call (555) 555-5555.',
+            'published_at' => Carbon::now(),
         ]);
 
         $this->browse(function (Browser $browser) use ($concert) {
@@ -42,5 +45,23 @@ class ViewConcertListingTest extends DuskTestCase
                 ->assertSee('Laraville, ON 17916')
                 ->assertSee('For tickets, call (555) 555-5555.');
         });
+    }
+
+    /** @test */
+    public function user_can_not_view_unpublished_concert_listing(): void
+    {
+        /** @var Concert */
+        $concert = Concert::factory()->create([
+            'published_at' => null,
+        ]);
+
+        $this->browse(function (Browser $browser) use ($concert) {
+            $browser->visit('/concerts/' . $concert->id)
+                ->assertDontSee($concert->title)
+                ->assertDontSee($concert->subtitle);
+        });
+
+        $response = $this->get('/concerts/' . $concert->id);
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
 }
