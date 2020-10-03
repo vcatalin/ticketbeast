@@ -29,7 +29,11 @@ Vue.component(
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+import TicketCheckout from './components/TicketCheckout.vue';
 
 const app = new Vue({
     el: '#app',
+    components: {
+        TicketCheckout,
+    },
 });
