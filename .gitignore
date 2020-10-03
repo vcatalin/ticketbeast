@@ -12,5 +12,7 @@ npm-debug.log
 yarn-error.log
 .DS_Store
 composer.lock
-database/sqlite.testing.database
 package-lock.json
+public/css/app.css
+public/js/app.js
+database/sqlite.testing.database
