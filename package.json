@@ -24,6 +24,7 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
+        "@popperjs/core": "^2.5.3",
         "normalize.css": "^8.0.1",
         "rsvp": "^4.8.5",
         "suitcss-base": "^5.0.0"
