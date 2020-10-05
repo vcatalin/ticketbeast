@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Database\Seeders;
 
 use App\Models\Concert;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Seeder;
 
 class ConcertSeeder extends Seeder
@@ -15,10 +16,7 @@ class ConcertSeeder extends Seeder
      */
     public function run()
     {
-        Concert::factory()->count(10)->create([
-            'published_at' =>  Carbon::parse('-1 week'),
-        ]);
-
-        Concert::factory()->count(10)->create();
+        Concert::factory()->published()->count(10)->create();
+        Concert::factory()->unpublished()->count(10)->create();
     }
 }
