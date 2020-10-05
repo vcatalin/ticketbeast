@@ -15,4 +15,3 @@ composer.lock
 package-lock.json
 public/css/app.css
 public/js/app.js
-database/sqlite.testing.database
