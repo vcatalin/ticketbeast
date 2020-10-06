@@ -32,6 +32,7 @@ class Concert extends Model
 
     /**
      * Scope a query to only published concerts.
+     * Concert::published()->get()
      */
     public function scopePublished(Builder $query): Builder
     {
@@ -41,5 +42,18 @@ class Concert extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function orderTickets(string $email, int $ticketQuantity)
+    {
+        $order = $this->orders()->create([
+            'email' => $email,
+        ]);
+
+        foreach (range(1, $ticketQuantity) as $item) {
+            $order->tickets()->create([]);
+        }
+
+        return $order;
     }
 }

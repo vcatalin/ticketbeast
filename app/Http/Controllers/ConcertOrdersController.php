@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Billing\PaymentGateway;
 use App\Models\Concert;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class ConcertOrdersController extends Controller
 {
@@ -15,17 +18,24 @@ class ConcertOrdersController extends Controller
         PaymentGateway $paymentGateway
     ) {
         $concert = Concert::find($concertId);
+
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        // Chargin the customer
         $ticketQuantity = $request->input('ticket_quantity');
+        $email = $request->input('email');
+
         $amount = $ticketQuantity * $concert->ticket_price;
         $paymentGateway->charge($amount, $request->input('payment_token'));
 
-        $order = $concert->orders()->create([
-            'email' => $request->input('email'),
-        ]);
+        // Creating the order
+        $order = $concert->orderTickets(
+            $email,
+            $ticketQuantity
+        );
 
-        foreach (range(1, $ticketQuantity) as $item) {
-            $order->tickets()->create([]);
-        }
-        return new JsonResponse([], 201);
+        return new JsonResponse([], Response::HTTP_ACCEPTED);
     }
 }
