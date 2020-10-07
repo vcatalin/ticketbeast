@@ -9,6 +9,7 @@ use App\Models\Concert;
 use App\Billing\FakePaymentGateway;
 use App\Billing\PaymentGateway;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class PurchaseTicketsTest extends TestCase
@@ -48,14 +49,23 @@ class PurchaseTicketsTest extends TestCase
      * @test
      * @dataProvider validationData
     */
-    function validate_input_request(array $data, int $status, string $input): void
+    function validate_input_request(array $data, int $status, string $errorKey): void
     {
         $concert = Concert::factory()->create();
 
         $response = $this->json('POST', "/concerts/{$concert->id}/orders", $data);
 
-        $response->assertStatus($status);
-        $this->assertArrayHasKey($input, $response->json('errors'));
+        $this->assertValidationError($response, $status, $errorKey);
+
+    }
+
+    private function assertValidationError(
+        TestResponse $testResponse,
+        int $status,
+        string $errorKey
+    ): void {
+        $testResponse->assertStatus($status);
+        $this->assertArrayHasKey($errorKey, $testResponse->json('errors'));
     }
 
     public function validationData()
@@ -67,7 +77,7 @@ class PurchaseTicketsTest extends TestCase
                     'payment_token' => 'test-token',
                 ],
                 'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
-                'inputKey' => 'email',
+                'errorKey' => 'email',
             ],
             'email_must_be_valid_to_purchase_tickets' => [
                 'data' => [
@@ -76,7 +86,7 @@ class PurchaseTicketsTest extends TestCase
                     'payment_token' => 'test-token'
                 ],
                 'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
-                'inputKey' => 'email',
+                'errorKey' => 'email',
             ],
             'ticket_quantity_is_required_to_purchase_tickets' => [
                 'data' => [
@@ -84,7 +94,7 @@ class PurchaseTicketsTest extends TestCase
                     'payment_token' => 'test-token',
                 ],
                 'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
-                'inputKey' => 'ticket_quantity',
+                'errorKey' => 'ticket_quantity',
             ],
             'ticket_quantity_must_be_at_least_1_to_purchase' => [
                 'data' => [
@@ -93,7 +103,7 @@ class PurchaseTicketsTest extends TestCase
                     'payment_token' => 'test-token',
                 ],
                 'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
-                'inputKey' => 'ticket_quantity',
+                'errorKey' => 'ticket_quantity',
             ],
             'payment_token_is_required' => [
                 'data' => [
@@ -101,7 +111,7 @@ class PurchaseTicketsTest extends TestCase
                     'ticket_quantity' => 1,
                 ],
                 'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
-                'inputKey' => 'payment_token',
+                'errorKey' => 'payment_token',
             ]
         ];
     }
