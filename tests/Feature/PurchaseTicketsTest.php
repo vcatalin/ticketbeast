@@ -15,6 +15,8 @@ class PurchaseTicketsTest extends TestCase
 {
     use DatabaseMigrations;
 
+    private PaymentGateway $paymentGateway;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -23,35 +25,84 @@ class PurchaseTicketsTest extends TestCase
     }
 
     /** @test */
-    public function successful_concert_purchase(): void
+    public function can_purchase_concerts(): void
     {
         $concert = Concert::factory()->create();
 
+        $ticketQuantity = 3;
         $response = $this->json('POST', "/concerts/{$concert->id}/orders", [
             'email' => 'john@example.com',
-            'ticket_quantity' => 3,
+            'ticket_quantity' => $ticketQuantity,
             'payment_token' => $this->paymentGateway->getValidTestToken(),
         ]);
 
         $response->assertStatus(Response::HTTP_ACCEPTED);
 
-        $this->assertEquals(2000 * 3, $this->paymentGateway->totalCharges());
+        $this->assertEquals($concert->ticket_price * $ticketQuantity, $this->paymentGateway->totalCharges());
         $order = $concert->orders()->where('email', 'john@example.com')->first();
         $this->assertNotNull($order);
         $this->assertEquals(3, $order->tickets()->count());
     }
 
-    /** @test */
-    function email_is_required_to_purchase_tickets(): void
+    /**
+     * @test
+     * @dataProvider validationData
+    */
+    function validate_input_request(array $data, int $status, string $input): void
     {
         $concert = Concert::factory()->create();
 
-        $response = $this->json('POST', "/concerts/{$concert->id}/orders", [
-            'ticket_quantity' => 3,
-            'payment_token' => $this->paymentGateway->getValidTestToken(),
-        ]);
+        $response = $this->json('POST', "/concerts/{$concert->id}/orders", $data);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $this->assertArrayHasKey('email', $response->json('errors'));
+        $response->assertStatus($status);
+        $this->assertArrayHasKey($input, $response->json('errors'));
+    }
+
+    public function validationData()
+    {
+        return [
+            'email_is_required_to_purchase_tickets' => [
+                'data' => [
+                    'ticket_quantity' => 3,
+                    'payment_token' => 'test-token',
+                ],
+                'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
+                'inputKey' => 'email',
+            ],
+            'email_must_be_valid_to_purchase_tickets' => [
+                'data' => [
+                    'email' => 'not-a-valid-email',
+                    'ticket_quantity' => 3,
+                    'payment_token' => 'test-token'
+                ],
+                'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
+                'inputKey' => 'email',
+            ],
+            'ticket_quantity_is_required_to_purchase_tickets' => [
+                'data' => [
+                    'email' => 'john@example.com',
+                    'payment_token' => 'test-token',
+                ],
+                'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
+                'inputKey' => 'ticket_quantity',
+            ],
+            'ticket_quantity_must_be_at_least_1_to_purchase' => [
+                'data' => [
+                    'email' => 'john@example.com',
+                    'ticket_quantity' => 0,
+                    'payment_token' => 'test-token',
+                ],
+                'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
+                'inputKey' => 'ticket_quantity',
+            ],
+            'payment_token_is_required' => [
+                'data' => [
+                    'email' => 'john@example.com',
+                    'ticket_quantity' => 1,
+                ],
+                'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
+                'inputKey' => 'payment_token',
+            ]
+        ];
     }
 }
