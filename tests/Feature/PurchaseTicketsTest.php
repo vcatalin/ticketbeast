@@ -16,7 +16,7 @@ class PurchaseTicketsTest extends TestCase
 {
     use DatabaseMigrations;
 
-    private PaymentGateway $paymentGateway;
+    private FakePaymentGateway $paymentGateway;
 
     protected function setUp(): void
     {
@@ -28,7 +28,7 @@ class PurchaseTicketsTest extends TestCase
     /** @test */
     public function can_purchase_concerts(): void
     {
-        $concert = Concert::factory()->create();
+        $concert = Concert::factory()->published()->create();
 
         $ticketQuantity = 3;
         $response = $this->json('POST', "/concerts/{$concert->id}/orders", [
@@ -37,7 +37,7 @@ class PurchaseTicketsTest extends TestCase
             'payment_token' => $this->paymentGateway->getValidTestToken(),
         ]);
 
-        $response->assertStatus(Response::HTTP_ACCEPTED);
+        $response->assertStatus(Response::HTTP_CREATED);
 
         $this->assertEquals($concert->ticket_price * $ticketQuantity, $this->paymentGateway->totalCharges());
         $order = $concert->orders()->where('email', 'john@example.com')->first();
@@ -45,13 +45,44 @@ class PurchaseTicketsTest extends TestCase
         $this->assertEquals(3, $order->tickets()->count());
     }
 
+    /** @test */
+    public function order_not_created_with_invalid_token(): void
+    {
+        $concert = Concert::factory()->published()->create();
+
+        $response = $this->json('POST', "/concerts/{$concert->id}/orders", [
+            'ticket_quantity' => 1,
+            'payment_token' => 'not-a-valid-token',
+            'email' => 'john@example.com',
+        ]);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        $order = $concert->orders()->where('email', 'john@example.com')->first();
+        $this->assertNull($order);
+    }
+
+    /** @test */
+    public function can_not_purchase_unpublished_concert(): void
+    {
+        $concert = Concert::factory()->unpublished()->create();
+        $response = $this->json('POST', "/concerts/{$concert->id}/orders", [
+            'ticket_quantity' => 1,
+            'payment_token' => $this->paymentGateway->getValidTestToken(),
+            'email' => 'john@example.com',
+        ]);
+
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+        $this->assertEquals(0, $concert->orders()->count());
+    }
+
     /**
      * @test
      * @dataProvider validationData
     */
-    function validate_input_request(array $data, int $status, string $errorKey): void
+    public function validate_input_request(array $data, int $status, string $errorKey): void
     {
-        $concert = Concert::factory()->create();
+        $concert = Concert::factory()->published()->create();
 
         $response = $this->json('POST', "/concerts/{$concert->id}/orders", $data);
 
