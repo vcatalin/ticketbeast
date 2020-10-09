@@ -13,4 +13,4 @@ Run the migrations with `php artisan migrate`
 Run the seeds with `php artisan db:seed --class=ConcertSeeder`  
 Run your server with `php artisan serve --env=.env.dusk.local`   
 Run the Laravel Dusk test suite using `php artisan dusk`  
-Run all the tests with `vendor/bing/phpunit`
+Run all the tests with `vendor/bin/phpunit`

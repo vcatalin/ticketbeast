@@ -26,7 +26,7 @@ class PurchaseTicketsTest extends TestCase
     }
 
     /** @test */
-    public function can_purchase_concerts(): void
+    public function can_purchase_published_concerts(): void
     {
         $concert = Concert::factory()->published()->create();
 
@@ -74,6 +74,7 @@ class PurchaseTicketsTest extends TestCase
 
         $response->assertStatus(Response::HTTP_NOT_FOUND);
         $this->assertEquals(0, $concert->orders()->count());
+        $this->assertEquals(0, $this->paymentGateway->totalCharges());
     }
 
     /**
