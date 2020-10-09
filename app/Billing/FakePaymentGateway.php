@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Billing;
 
-use App\Billing\Exeptions\PaymentFailedException;
+use App\Billing\Exceptions\PaymentFailedException;
 
 class FakePaymentGateway implements PaymentGateway
 {

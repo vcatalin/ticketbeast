@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace Tests\Unit\Billing;
 
-use Tests\TestCase;
+use App\Billing\Exceptions\PaymentFailedException;
 use App\Billing\FakePaymentGateway;
-use App\Billing\Exeptions\PaymentFailedException;
+use Tests\TestCase;
 
 class FakePaymentGatewayTest extends TestCase
 {
@@ -27,6 +27,7 @@ class FakePaymentGatewayTest extends TestCase
             $paymentGateway = new FakePaymentGateway();
             $paymentGateway->charge(2500, 'invalid-payment-token');
         } catch (PaymentFailedException $e) {
+            $this->assertEquals(0, $paymentGateway->totalCharges());
             return;
         }
 

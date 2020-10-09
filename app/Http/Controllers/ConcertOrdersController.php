@@ -4,11 +4,11 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
-use App\Billing\Exeptions\PaymentFailedException;
-use Illuminate\Http\Request;
+use App\Billing\Exceptions\PaymentFailedException;
 use App\Billing\PaymentGateway;
 use App\Models\Concert;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -19,6 +19,7 @@ class ConcertOrdersController extends Controller
         int $concertId,
         PaymentGateway $paymentGateway
     ) {
+        /** @var Concert $concert */
         $concert = Concert::published()->findOrFail($concertId);
 
         $request->validate([
@@ -36,10 +37,7 @@ class ConcertOrdersController extends Controller
             $paymentGateway->charge($amount, $request->input('payment_token'));
 
             // Creating the order
-            $order = $concert->orderTickets(
-                $email,
-                $ticketQuantity
-            );
+            $concert->orderTickets($email, $ticketQuantity);
 
             return new JsonResponse([], Response::HTTP_CREATED);
         } catch (PaymentFailedException $e) {

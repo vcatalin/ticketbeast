@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace App\Billing\Exeptions;
+namespace App\Billing\Exceptions;
 
 use Exception;
 
