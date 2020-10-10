@@ -72,7 +72,9 @@ class PurchaseTicketsTest extends TestCase
     /** @test */
     public function order_not_created_with_invalid_token(): void
     {
+        /** @var Concert $concert */
         $concert = Concert::factory()->published()->create();
+        $concert->addTickets(1);
 
         $response = $this->json('POST', "/concerts/{$concert->id}/orders", [
             'ticket_quantity' => 1,
@@ -89,7 +91,10 @@ class PurchaseTicketsTest extends TestCase
     /** @test */
     public function can_not_purchase_unpublished_concert(): void
     {
+        /** @var Concert $concert */
         $concert = Concert::factory()->unpublished()->create();
+        $concert->addTickets(1);
+
         $response = $this->json('POST', "/concerts/{$concert->id}/orders", [
             'ticket_quantity' => 1,
             'payment_token' => $this->paymentGateway->getValidTestToken(),
@@ -107,7 +112,9 @@ class PurchaseTicketsTest extends TestCase
     */
     public function validate_input_request(array $data, int $status, string $errorKey): void
     {
+        /** @var Concert $concert */
         $concert = Concert::factory()->published()->create();
+        $concert->addTickets(1);
 
         $response = $this->json('POST', "/concerts/{$concert->id}/orders", $data);
 

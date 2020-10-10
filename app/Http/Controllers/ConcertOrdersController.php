@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
+use App\Billing\Exceptions\NotEnoughTicketsException;
 use App\Billing\Exceptions\PaymentFailedException;
 use App\Billing\PaymentGateway;
 use App\Models\Concert;
@@ -31,16 +32,16 @@ class ConcertOrdersController extends Controller
         try {
             $ticketQuantity = $request->input('ticket_quantity');
             $email = $request->input('email');
+            $paymentToken = $request->input('payment_token');
 
-            // Charging the customer
             $amount = $ticketQuantity * $concert->ticket_price;
-            $paymentGateway->charge($amount, $request->input('payment_token'));
 
-            // Creating the order
-            $concert->orderTickets($email, $ticketQuantity);
+            $order = $concert->orderTickets($email, $ticketQuantity);
+            $paymentGateway->charge($amount, $paymentToken);
 
             return new JsonResponse([], Response::HTTP_CREATED);
-        } catch (PaymentFailedException $e) {
+        } catch (PaymentFailedException | NotEnoughTicketsException $e) {
+            $order->cancel();
             throw new HttpException(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
