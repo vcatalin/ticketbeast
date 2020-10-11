@@ -18,6 +18,7 @@ class ConcertTest extends TestCase
     /** @test */
     public function retrieved_date_is_formatted(): void
     {
+        /** @var Concert $concert */
         $concert = Concert::factory()->make([
                 'date' => Carbon::parse('2016-12-01 8:00pm'),
         ]);
@@ -28,6 +29,7 @@ class ConcertTest extends TestCase
     /** @test */
     public function retrieved_start_time_is_formatted(): void
     {
+        /** @var Concert $concert */
         $concert = Concert::factory()->make([
             'date' => Carbon::parse('2016-12-01 17:00:00'),
         ]);
@@ -67,6 +69,7 @@ class ConcertTest extends TestCase
     public function order_concert_tickets(): void
     {
         $ticketQuantity = 3;
+
         /** @var Concert $concert */
         $concert = Concert::factory()->create();
         $concert->addTickets($ticketQuantity);
@@ -95,6 +98,7 @@ class ConcertTest extends TestCase
         $concert->addTickets(50);
 
         $ticketQuantity = 30;
+
         $concert->orderTickets('jane@example.com', $ticketQuantity);
 
         $this->assertEquals(20, $concert->ticketsRemaining());
@@ -103,11 +107,11 @@ class ConcertTest extends TestCase
     /** @test */
     public function purchasing_more_tickets_than_remain_throws_exception(): void
     {
-        $email = 'john@example.com';
-
         /** @var Concert $concert */
         $concert = Concert::factory()->create();
         $concert->addTickets(10);
+
+        $email = 'john@example.com';
 
         try {
             $concert->orderTickets($email, 11);
@@ -123,7 +127,7 @@ class ConcertTest extends TestCase
     }
 
     /** @test */
-    public function can_not_order_tickets_that_have_been_already_been_purcahsed(): void
+    public function can_not_order_tickets_that_have_been_already_been_purchased(): void
     {
         /** @var Concert $concert */
         $concert = Concert::factory()->create();
