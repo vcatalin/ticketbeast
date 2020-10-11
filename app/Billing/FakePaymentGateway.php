@@ -28,7 +28,7 @@ class FakePaymentGateway implements PaymentGateway
         $this->charges[] = $amount;
     }
 
-    public function totalCharges()
+    public function totalCharges(): int
     {
         return $this->charges->sum();
     }

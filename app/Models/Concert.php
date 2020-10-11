@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Billing\Exceptions\NotEnoughTicketsException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -45,6 +46,16 @@ class Concert extends Model
         return $this->hasMany(Order::class);
     }
 
+    public function hasOrderFor(string $customerEmail): bool
+    {
+        return $this->orders()->where('email', $customerEmail)->count() > 0;
+    }
+
+    public function ordersFor(string $customerEmail): Collection
+    {
+        return $this->orders()->where('email', $customerEmail)->get();
+    }
+
     public function tickets()
     {
         return $this->hasMany(Ticket::class);
@@ -69,11 +80,13 @@ class Concert extends Model
         return $order;
     }
 
-    public function addTickets(int $ticketQuantity): void
+    public function addTickets(int $ticketQuantity): Concert
     {
         foreach (range(1, $ticketQuantity) as $item) {
             $this->tickets()->create([]);
         }
+
+        return $this;
     }
 
     public function ticketsRemaining(): int

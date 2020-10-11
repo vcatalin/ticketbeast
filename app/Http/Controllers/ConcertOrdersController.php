@@ -19,7 +19,7 @@ class ConcertOrdersController extends Controller
         Request $request,
         int $concertId,
         PaymentGateway $paymentGateway
-    ) {
+    ): JsonResponse {
         /** @var Concert $concert */
         $concert = Concert::published()->findOrFail($concertId);
 

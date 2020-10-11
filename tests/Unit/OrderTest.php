@@ -13,14 +13,15 @@ class OrderTest extends TestCase
 {
      use DatabaseMigrations;
 
-     /** @test */
+     private const CUSTOMER_EMAIL = 'john@example.com';
+
+    /** @test */
     public function tickets_are_released_when_an_order_is_cancelled(): void
     {
         /** @var Concert $concert */
-        $concert = Concert::factory()->published()->create();
-        $concert->addTickets(3);
+        $concert = Concert::factory()->published()->create()->addTickets(3);
 
-        $order = $concert->orderTickets('john@example.com', 3);
+        $order = $concert->orderTickets(self::CUSTOMER_EMAIL, 3);
         $this->assertEquals(0, $concert->ticketsRemaining());
 
         $order->cancel();

@@ -11,13 +11,13 @@ use Tests\TestCase;
 class FakePaymentGatewayTest extends TestCase
 {
     /** @test */
-    public function charge_with_a_valid_payment_token_is_successfull(): void
+    public function charge_with_a_valid_payment_token_is_successful(): void
     {
         $paymentGateway = new FakePaymentGateway();
 
         $paymentGateway->charge(2500, $paymentGateway->getValidTestToken());
 
-        self::assertEquals(2500, $paymentGateway->totalCharges());
+        $this->assertEquals(2500, $paymentGateway->totalCharges());
     }
 
     /** @test */
@@ -31,6 +31,6 @@ class FakePaymentGatewayTest extends TestCase
             return;
         }
 
-        self::fail();
+        $this->fail();
     }
 }
