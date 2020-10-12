@@ -41,16 +41,14 @@ class PurchaseTicketsTest extends TestCase
             'payment_token' => $this->paymentGateway->getValidTestToken(),
         ]);
 
-        $response->assertStatus(Response::HTTP_CREATED);
-
         $totalPrice = $concert->ticket_price * $ticketQuantity;
 
+        $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJsonFragment([
             'email' => self::CUSTOMER_EMAIL,
             'ticket_quantity' => $ticketQuantity,
             'amount' => $totalPrice,
         ]);
-
         $this->assertEquals($totalPrice, $this->paymentGateway->totalCharges());
         $this->assertTrue($concert->hasOrderFor(self::CUSTOMER_EMAIL));
         $this->assertEquals(
