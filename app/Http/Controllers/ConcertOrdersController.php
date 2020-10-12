@@ -39,7 +39,7 @@ class ConcertOrdersController extends Controller
             $order = $concert->orderTickets($email, $ticketQuantity);
             $paymentGateway->charge($amount, $paymentToken);
 
-            return new JsonResponse([], Response::HTTP_CREATED);
+            return new JsonResponse($order, Response::HTTP_CREATED);
         } catch (PaymentFailedException $e) {
             $order->cancel();
             throw new HttpException(Response::HTTP_UNPROCESSABLE_ENTITY);
