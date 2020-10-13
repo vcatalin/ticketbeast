@@ -30,6 +30,7 @@ class PurchaseTicketsTest extends TestCase
     /** @test */
     public function can_purchase_published_concerts(): void
     {
+        $this->disableExceptionHandling();
         $ticketQuantity = 3;
 
         /** @var Concert $concert */

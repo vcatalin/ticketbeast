@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Concert extends Model
 {
@@ -41,9 +43,9 @@ class Concert extends Model
         return $query->whereNotNull('published_at');
     }
 
-    public function orders()
+    public function orders(): BelongsToMany
     {
-        return $this->hasMany(Order::class);
+        return $this->belongsToMany(Order::class, 'tickets');
     }
 
     public function hasOrderFor(string $customerEmail): bool
@@ -56,7 +58,7 @@ class Concert extends Model
         return $this->orders()->where('email', $customerEmail)->get();
     }
 
-    public function tickets()
+    public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
     }
@@ -100,9 +102,9 @@ class Concert extends Model
     public function createOrder(string $email, Collection $tickets): Order
     {
         /** @var Order $order */
-        $order = $this->orders()->create([
+        $order = Order::create([
             'email' => $email,
-            'amount' => $tickets->count() * $this->ticket_price,
+            'amount' => $tickets->sum('price'),
         ]);
 
         foreach ($tickets as $ticket) {
