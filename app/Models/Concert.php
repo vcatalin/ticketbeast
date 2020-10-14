@@ -66,7 +66,7 @@ class Concert extends Model
     public function orderTickets(string $email, int $ticketQuantity): Order
     {
         $tickets = $this->findTickets($ticketQuantity);
-        return $this->createOrder($email, $tickets);
+        return $this->createOrder($tickets, $email);
 
     }
 
@@ -99,18 +99,8 @@ class Concert extends Model
         return $tickets;
     }
 
-    public function createOrder(string $email, Collection $tickets): Order
+    public function createOrder(Collection $tickets, string $email): Order
     {
-        /** @var Order $order */
-        $order = Order::create([
-            'email' => $email,
-            'amount' => $tickets->sum('price'),
-        ]);
-
-        foreach ($tickets as $ticket) {
-            $order->tickets()->save($ticket);
-        }
-
-        return $order;
+        return Order::forTickets($tickets, $email, $tickets->sum('price'));
     }
 }

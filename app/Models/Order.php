@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
@@ -12,12 +14,26 @@ class Order extends Model
 
     protected $guarded = [];
 
-    public function tickets()
+    public static function forTickets(Collection $tickets, string $email, int $amount): Order
+    {
+        $order = self::create([
+            'email' => $email,
+            'amount' => $amount,
+        ]);
+
+        foreach ($tickets as $ticket) {
+            $order->tickets()->save($ticket);
+        }
+
+        return $order;
+    }
+
+    public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
     }
 
-    public function concert()
+    public function concert(): BelongsTo
     {
         return $this->belongsTo(Concert::class);
     }
@@ -44,6 +60,4 @@ class Order extends Model
             'amount' => $this->amount,
         ];
     }
-
-
 }

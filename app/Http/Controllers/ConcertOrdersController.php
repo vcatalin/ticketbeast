@@ -8,6 +8,8 @@ use App\Billing\Exceptions\NotEnoughTicketsException;
 use App\Billing\Exceptions\PaymentFailedException;
 use App\Billing\PaymentGateway;
 use App\Models\Concert;
+use App\Models\Order;
+use App\Reservation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,11 +36,11 @@ class ConcertOrdersController extends Controller
             $email = $request->input('email');
             $paymentToken = $request->input('payment_token');
 
-            $amount = $ticketQuantity * $concert->ticket_price;
-
             $tickets = $concert->findTickets($ticketQuantity);
-            $paymentGateway->charge($amount, $paymentToken);
-            $order = $concert->createOrder($email, $tickets);
+            $reservation = new Reservation($tickets);
+
+            $paymentGateway->charge($reservation->totalCost(), $paymentToken);
+            $order = Order::forTickets($tickets, $email, $reservation->totalCost());
 
             return new JsonResponse($order, Response::HTTP_CREATED);
         } catch (PaymentFailedException $e) {
