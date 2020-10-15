@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Models\Concert;
+use App\Models\Ticket;
 use App\Reservation;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Collection;
+use Mockery;
 use Tests\TestCase;
 
 class ReservationTest extends TestCase
 {
-    use DatabaseMigrations;
-
     /** @test */
     public function calculating_the_total_cost(): void
     {
-        /** @var Concert $concert */
-        $concert = Concert::factory()->published()->create(['ticket_price' => 1200])->addTickets(3);
-        $tickets = $concert->findTickets(3);
+        $tickets = new Collection([
+            (object) ['price' => 1200],
+            (object) ['price' => 1200],
+            (object) ['price' => 1200],
+        ]);
 
         $reservation = new Reservation($tickets);
 

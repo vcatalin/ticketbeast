@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class Reservation
 {
