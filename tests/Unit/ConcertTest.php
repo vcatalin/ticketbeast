@@ -67,6 +67,20 @@ class ConcertTest extends TestCase
     }
 
     /** @test */
+    public function can_reserve_available_tickets(): void
+    {
+        /** @var Concert $concert */
+        $concert = Concert::factory()->published()->create()->addTickets(3);
+
+        $this->assertEquals(3, $concert->ticketsRemaining());
+
+        $reservedTickets = $concert->reserveTickets(2);
+
+        $this->assertCount(2, $reservedTickets);
+        $this->assertEquals(1, $concert->ticketsRemaining());
+    }
+
+    /** @test */
     public function order_concert_tickets(): void
     {
         $ticketQuantity = 3;

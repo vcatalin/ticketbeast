@@ -16,6 +16,16 @@ class TicketTest extends TestCase
     private const CUSTOMER_EMAIL = 'john@example.com';
 
     /** @test */
+    public function tickets_can_be_reserved(): void
+    {
+        $ticket = Ticket::factory()->create();
+        $this->assertNull($ticket->reserved_at);
+        $ticket->reserve();
+
+        $this->assertNotNull($ticket->fresh()->reserved_at);
+    }
+
+    /** @test */
     public function a_ticket_can_be_released(): void
     {
         /** @var Concert $concert */

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class Ticket extends Model
 {
@@ -21,6 +22,11 @@ class Ticket extends Model
     public function concert(): BelongsTo
     {
         return  $this->belongsTo(Concert::class);
+    }
+
+    public function reserve(): void
+    {
+        $this->update(['reserved_at' => Carbon::now()]);
     }
 
     public function release(): void
