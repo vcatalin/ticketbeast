@@ -36,7 +36,7 @@ class ConcertOrdersController extends Controller
             $email = $request->input('email');
             $paymentToken = $request->input('payment_token');
 
-            $tickets = $concert->findTickets($ticketQuantity);
+            $tickets = $concert->reserveTickets($ticketQuantity);
             $reservation = new Reservation($tickets);
 
             $paymentGateway->charge($reservation->totalCost(), $paymentToken);

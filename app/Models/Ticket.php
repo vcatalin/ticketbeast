@@ -16,7 +16,7 @@ class Ticket extends Model
 
     public function scopeAvailable(Builder $query): Builder
     {
-        return $query->whereNull('order_id');
+        return $query->whereNull('order_id')->whereNull('reserved_at');
     }
 
     public function concert(): BelongsTo
