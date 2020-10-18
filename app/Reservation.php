@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
+
 use Illuminate\Support\Collection;
 
 class Reservation
@@ -25,5 +26,10 @@ class Reservation
         foreach($this->tickets as $ticket) {
             $ticket->release();
         }
+    }
+
+    public function tickets(): Collection
+    {
+        return $this->tickets;
     }
 }

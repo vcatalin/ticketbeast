@@ -6,6 +6,7 @@ namespace Tests\Unit;
 
 use App\Billing\Exceptions\NotEnoughTicketsException;
 use App\Models\Concert;
+use App\Reservation;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -74,9 +75,9 @@ class ConcertTest extends TestCase
 
         $this->assertEquals(3, $concert->ticketsRemaining());
 
-        $reservedTickets = $concert->reserveTickets(2);
+        $reservation = $concert->reserveTickets(2);
 
-        $this->assertCount(2, $reservedTickets);
+        $this->assertCount(2, $reservation->tickets());
         $this->assertEquals(1, $concert->ticketsRemaining());
     }
 
