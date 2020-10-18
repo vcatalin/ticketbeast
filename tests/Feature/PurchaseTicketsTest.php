@@ -121,8 +121,8 @@ class PurchaseTicketsTest extends TestCase
         ]);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-
         $this->assertFalse($concert->hasOrderFor(self::CUSTOMER_EMAIL));
+        $this->assertEquals(1, $concert->ticketsRemaining());
     }
 
     /** @test */

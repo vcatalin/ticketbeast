@@ -99,6 +99,9 @@ class Concert extends Model
         return $tickets;
     }
 
+    /**
+     * @throws NotEnoughTicketsException
+     */
     public function reserveTickets(int $ticketQuantity): Collection
     {
         return $this->findTickets($ticketQuantity)->each(function (Ticket $ticket) {
