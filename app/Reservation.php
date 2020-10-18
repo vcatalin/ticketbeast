@@ -10,10 +10,12 @@ use Illuminate\Support\Collection;
 class Reservation
 {
     private Collection $tickets;
+    private string $email;
 
-    public function __construct(Collection $tickets)
+    public function __construct(Collection $tickets, string $email)
     {
         $this->tickets = $tickets;
+        $this->email = $email;
     }
 
     public function totalCost(): int
@@ -31,5 +33,10 @@ class Reservation
     public function tickets(): Collection
     {
         return $this->tickets;
+    }
+
+    public function email()
+    {
+        return $this->email;
     }
 }

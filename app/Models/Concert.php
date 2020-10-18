@@ -103,12 +103,12 @@ class Concert extends Model
     /**
      * @throws NotEnoughTicketsException
      */
-    public function reserveTickets(int $ticketQuantity): Reservation
+    public function reserveTickets(int $ticketQuantity, string $email): Reservation
     {
         $tickets = $this->findTickets($ticketQuantity)->each(function (Ticket $ticket) {
             $ticket->reserve();
         });
-        return new Reservation($tickets);
+        return new Reservation($tickets, $email);
     }
 
     public function createOrder(Collection $tickets, string $email): Order

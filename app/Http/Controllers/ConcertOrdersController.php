@@ -36,11 +36,11 @@ class ConcertOrdersController extends Controller
             $email = $request->input('email');
             $paymentToken = $request->input('payment_token');
 
-            $reservation = $concert->reserveTickets($ticketQuantity);
+            $reservation = $concert->reserveTickets($ticketQuantity, $email);
 
             $paymentGateway->charge($reservation->totalCost(), $paymentToken);
 
-            $order = Order::forTickets($reservation->tickets(), $email, $reservation->totalCost());
+            $order = Order::forTickets($reservation->tickets(), $reservation->email(), $reservation->totalCost());
 
             return new JsonResponse($order, Response::HTTP_CREATED);
         } catch (PaymentFailedException $e) {
