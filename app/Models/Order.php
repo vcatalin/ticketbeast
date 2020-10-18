@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Reservation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,20 @@ class Order extends Model
         ]);
 
         foreach ($tickets as $ticket) {
+            $order->tickets()->save($ticket);
+        }
+
+        return $order;
+    }
+
+    public static function fromReservation(Reservation $reservation): Order
+    {
+        $order = self::create([
+            'email' => $reservation->email(),
+            'amount' => $reservation->totalCost(),
+        ]);
+
+        foreach ($reservation->tickets() as $ticket) {
             $order->tickets()->save($ticket);
         }
 
