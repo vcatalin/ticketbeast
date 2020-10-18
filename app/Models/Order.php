@@ -43,15 +43,6 @@ class Order extends Model
         return $this->tickets()->count();
     }
 
-    public function cancel(): void
-    {
-        foreach ($this->tickets as $ticket) {
-            $ticket->release();
-        }
-
-        $this->delete();
-    }
-
     public function toArray(): array
     {
         return [

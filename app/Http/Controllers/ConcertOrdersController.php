@@ -44,6 +44,7 @@ class ConcertOrdersController extends Controller
 
             return new JsonResponse($order, Response::HTTP_CREATED);
         } catch (PaymentFailedException $e) {
+            $reservation->cancel();
             throw new HttpException(Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (NotEnoughTicketsException $e) {
             throw new HttpException(Response::HTTP_UNPROCESSABLE_ENTITY);

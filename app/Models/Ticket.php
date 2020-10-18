@@ -31,7 +31,7 @@ class Ticket extends Model
 
     public function release(): void
     {
-        $this->update(['order_id' => null]);
+        $this->update(['reserved_at' => null]);
     }
 
     public function getPriceAttribute(): int
