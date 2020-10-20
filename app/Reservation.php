@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-
+use App\Models\Order;
 use Illuminate\Support\Collection;
 
 class Reservation
@@ -35,8 +35,13 @@ class Reservation
         return $this->tickets;
     }
 
-    public function email()
+    public function email(): string
     {
         return $this->email;
+    }
+
+    public function complete(): Order
+    {
+        return Order::forTickets($this->tickets(), $this->email(), $this->totalCost());
     }
 }

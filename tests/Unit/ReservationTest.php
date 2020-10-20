@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\Models\Concert;
 use App\Models\Ticket;
 use App\Reservation;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Collection;
 use Mockery;
 use Mockery\MockInterface;
@@ -13,6 +15,8 @@ use Tests\TestCase;
 
 class ReservationTest extends TestCase
 {
+    use DatabaseMigrations;
+
     /** @test */
     public function calculating_the_total_cost(): void
     {
@@ -68,5 +72,22 @@ class ReservationTest extends TestCase
         $reservation = new Reservation($tickets,'john@example.com');
 
         $this->assertEquals('john@example.com', $reservation->email());
+    }
+
+    /** @test */
+    public function completing_a_reservation(): void
+    {
+        /** @var Concert $concert */
+        $concert = Concert::factory()->published()->create(['ticket_price' => 1200]);
+
+        /** @var Collection $tickets */
+        $tickets = Ticket::factory()->count(3)->create(['concert_id' => $concert->id]);
+
+        $reservation = new Reservation($tickets, 'john@example.com');
+        $order = $reservation->complete();
+
+        $this->assertEquals('john@example.com', $order->email);
+        $this->assertEquals(3, $order->ticketQuantity());
+        $this->assertEquals(3600, $order->amount);
     }
 }
