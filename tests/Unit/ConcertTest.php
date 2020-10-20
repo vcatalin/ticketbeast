@@ -6,7 +6,6 @@ namespace Tests\Unit;
 
 use App\Billing\Exceptions\NotEnoughTicketsException;
 use App\Models\Concert;
-use App\Reservation;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;

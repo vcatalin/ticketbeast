@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Billing\PaymentGateway;
 use App\Models\Order;
 use Illuminate\Support\Collection;
 
@@ -40,8 +41,12 @@ class Reservation
         return $this->email;
     }
 
-    public function complete(): Order
+    /**
+     * @throws Billing\Exceptions\PaymentFailedException
+     */
+    public function complete(PaymentGateway $paymentGateway, string $paymentToken): Order
     {
+        $paymentGateway->charge($this->totalCost(), $paymentToken);
         return Order::forTickets($this->tickets(), $this->email(), $this->totalCost());
     }
 }
