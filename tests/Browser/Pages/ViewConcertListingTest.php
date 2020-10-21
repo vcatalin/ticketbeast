@@ -11,6 +11,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group browser
+ */
 class ViewConcertListingTest extends DuskTestCase
 {
     use DatabaseMigrations;
