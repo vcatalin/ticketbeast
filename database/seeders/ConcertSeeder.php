@@ -16,7 +16,11 @@ class ConcertSeeder extends Seeder
      */
     public function run()
     {
-        Concert::factory()->published()->count(10)->create();
+        $publishedConcerts = Concert::factory()->published()->count(10)->create();
+        foreach ($publishedConcerts as $concert) {
+            $concert->addTickets(10);
+        }
+
         Concert::factory()->unpublished()->count(10)->create();
     }
 }

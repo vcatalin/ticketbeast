@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Billing\PaymentGateway;
+use App\Billing\StripePaymentGateway;
 use Illuminate\Support\ServiceProvider;
+use Stripe\StripeClient;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +16,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(PaymentGateway::class, function () {
+            return new StripePaymentGateway(
+                new StripeClient(config('services.stripe.secret'))
+            );
+        });
     }
 
     /**

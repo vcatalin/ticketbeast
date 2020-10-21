@@ -71,6 +71,15 @@
                                         placeholder="Halugona"
                                     />
                                 </label>
+                                <label>
+                                    <span>Email</span>
+                                    <input
+                                        id="email-address"
+                                        name="email-address"
+                                        class="field"
+                                        placeholder="john@example.com"
+                                    />
+                                </label>
                             </div>
                             <div class="group">
                                 <label>
@@ -133,7 +142,7 @@
                                 </label>
                             </div>
                             <button class="btn btn-block" type="submit">
-                                Pay $25
+                                Pay ${{ totalPriceInDollars }}
                             </button>
                         </form>
 
@@ -170,6 +179,7 @@ export default {
             processing: false,
             showModal: false,
             cardElement: null,
+            email: null
         };
     },
     computed: {
@@ -230,8 +240,9 @@ export default {
             this.card = card;
         },
         createStripeToken(event) {
-            var card = this.card
-            var options = {
+            let card = this.card;
+            this.email = document.getElementById("email-address").value;
+            let options = {
                         name:
                             document.getElementById("first-name").value +
                             " " +
@@ -263,7 +274,10 @@ export default {
             errorElement.classList.remove("visible");
 
             if (result.token) {
-                // Just display the token
+                // Create order
+                this.purchaseTickets(result.token);
+
+                // Display the token
                 this.$refs.token.textContent = result.token.id;
                 successElement.classList.add("visible");
             } else if (result.error) {
@@ -274,14 +288,19 @@ export default {
         purchaseTickets(token) {
             this.processing = true;
 
+            console.log("Email: " + this.email);
+            console.log("Quantity: " + this.quantity);
+            console.log("TokenId: " + token.id);
+
             axios
                 .post(`/concerts/${this.concertId}/orders`, {
-                    email: token.email,
+                    email: this.email,
                     ticket_quantity: this.quantity,
                     payment_token: token.id
                 })
                 .then(response => {
-                    window.location = `/orders/${response.data.confirmation_number}`;
+                    // window.location = `/orders/${response.data.confirmation_number}`;
+                    console.log("Charge succeeded!");
                 })
                 .catch(response => {
                     this.processing = false;
