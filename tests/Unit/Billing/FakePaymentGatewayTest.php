@@ -6,15 +6,20 @@ namespace Tests\Unit\Billing;
 
 use App\Billing\Exceptions\PaymentFailedException;
 use App\Billing\FakePaymentGateway;
+use App\Billing\PaymentGateway;
 use Tests\TestCase;
 
 class FakePaymentGatewayTest extends TestCase
 {
+    protected function getPaymentGateway(): PaymentGateway
+    {
+        return new FakePaymentGateway();
+    }
+
     /** @test */
     public function charge_with_a_valid_payment_token_is_successful(): void
     {
-        $paymentGateway = new FakePaymentGateway();
-
+        $paymentGateway = $this->getPaymentGateway();
         $paymentGateway->charge(2500, $paymentGateway->getValidTestToken());
 
         $this->assertEquals(2500, $paymentGateway->totalCharges());
