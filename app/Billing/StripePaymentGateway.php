@@ -63,7 +63,6 @@ class StripePaymentGateway implements PaymentGateway
     {
         $newCharges = $this->stripeClient->charges->all(
             [
-                'limit' => 1,
                 'ending_before' => $charge->id ?? null,
             ]
         )['data'];
