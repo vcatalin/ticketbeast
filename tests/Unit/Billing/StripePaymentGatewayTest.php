@@ -59,11 +59,6 @@ class StripePaymentGatewayTest extends TestCase
         $this->assertEquals(1515, $newCharges->sum());
     }
 
-    private function lastCharge(): Charge
-    {
-        return $this->stripeClient->charges->all(['limit' => 1])['data'][0];
-    }
-
     private function newCharges(): array
     {
         return $this->stripeClient->charges->all(

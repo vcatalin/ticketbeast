@@ -6,6 +6,7 @@ namespace App\Billing;
 
 use App\Billing\Exceptions\PaymentFailedException;
 use Closure;
+use Illuminate\Support\Collection;
 
 class FakePaymentGateway implements PaymentGateway
 {
@@ -44,5 +45,12 @@ class FakePaymentGateway implements PaymentGateway
     public function beforeFirstCharge(Closure $hook): void
     {
         $this->beforeFirstChargeCallback = $hook;
+    }
+
+    public function newChargesDuring(Closure $closure): Collection
+    {
+        $chargesFrom = $this->charges->count();
+        $closure();
+        return $this->charges->slice($chargesFrom)->values();
     }
 }
