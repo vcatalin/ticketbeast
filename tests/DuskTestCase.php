@@ -2,10 +2,13 @@
 
 namespace Tests;
 
+use App\Exceptions\Handler;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Laravel\Dusk\TestCase as BaseTestCase;
+use Throwable;
 
 abstract class DuskTestCase extends BaseTestCase
 {
@@ -41,5 +44,16 @@ abstract class DuskTestCase extends BaseTestCase
                 ->setCapability(ChromeOptions::CAPABILITY, $options)
                 ->setCapability('acceptInsecureCerts', TRUE)
         );
+    }
+
+    public function disableExceptionHandling(): void
+    {
+        $this->app->instance(ExceptionHandler::class, new class extends Handler {
+            public function __construct() {}
+            public function report(Throwable $e) {}
+            public function render ($request, Throwable $e) {
+                throw $e;
+            }
+        });
     }
 }

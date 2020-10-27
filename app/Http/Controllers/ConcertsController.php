@@ -8,9 +8,11 @@ use App\Models\Concert;
 
 class ConcertsController extends Controller
 {
-    public function show($id)
+    public function show(int $concertId)
     {
-        $concert = Concert::published()->findOrFail($id);
+        /** @var Concert $concert */
+        $concert = Concert::published()->findOrFail($concertId);
+
         return view('concerts.show', ['concert' => $concert]);
     }
 }
