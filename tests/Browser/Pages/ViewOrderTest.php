@@ -8,7 +8,6 @@ use App\Models\Concert;
 use App\Models\Order;
 use App\Models\Ticket;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Laravel\Dusk\Browser;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\DuskTestCase;
 
@@ -28,12 +27,13 @@ class ViewOrderTest extends DuskTestCase
             'order_id' => $order->id,
         ]);
 
-        $this->browse(function (Browser $browser) use ($order) {
-           $browser->visit('/orders/' . $order->confirmation_number);
-           $browser->assertSee('FOOBAR123');
-        });
+//        $this->browse(function (Browser $browser) use ($order) {
+//           $browser->visit('/orders/' . $order->confirmation_number);
+//           $browser->assertSee('FOOBAR123');
+//        });
 
         $response = $this->get('/orders/' . $order->confirmation_number);
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertViewHas('order', $order);
     }
 }
