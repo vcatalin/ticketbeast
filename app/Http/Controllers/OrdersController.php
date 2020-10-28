@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class OrdersController extends Controller
@@ -12,7 +13,8 @@ class OrdersController extends Controller
         Request $request,
         string $confirmationNumber
     ) {
-        $order = null;
+        $order = Order::findByConfirmationNumber($confirmationNumber);
+
         return view('orders.show', ['order' => $order]);
     }
 }

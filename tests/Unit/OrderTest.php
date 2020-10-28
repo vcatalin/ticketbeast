@@ -6,10 +6,8 @@ namespace Tests\Unit;
 
 use App\Models\Concert;
 use App\Models\Order;
-use App\Models\Ticket;
-use App\Reservation;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Collection;
 use Tests\TestCase;
 
 class OrderTest extends TestCase
@@ -57,5 +55,30 @@ class OrderTest extends TestCase
             'ticket_quantity' => 3,
             'amount' => $ticketPrice * $ticketQuantity,
         ], $result);
+    }
+
+    /** @test */
+    public function can_find_order_by_confirmation_number(): void
+    {
+        $confirmationNumber = 'FOOBAR123';
+        $order = Order::factory()->create([
+            'confirmation_number' => $confirmationNumber,
+        ]);
+
+        $retrievedOrder = Order::findByConfirmationNumber($confirmationNumber);
+
+        $this->assertEquals($order->id, $retrievedOrder->id);
+    }
+
+    /** @test */
+    public function exception_is_thrown_when_order_not_found_by_confirmation_number(): void
+    {
+        try {
+            Order::findByConfirmationNumber('RANDOMSTRING');
+        } catch (ModelNotFoundException $e) {
+            return;
+        }
+
+        $this->fail('Order was not found using the given confirmation number and exception was not being thrown.');
     }
 }
