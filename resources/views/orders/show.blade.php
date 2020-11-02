@@ -7,13 +7,13 @@
                 <div class="m-xs-b-6">
                     <div class="flex-baseline flex-spaced p-xs-y-4 border-b">
                         <h1 class="text-xl">Order Summary</h1>
-                        <a href="/" class="link-brand-soft">#123456890</a>
+                        <a href="#" class="link-brand-soft">{{ $order->confirmation_number }}</a>
                     </div>
                     <div class="p-xs-y-4 border-b">
                         <p>
-                            <strong>Order Total: $60</strong>
+                            <strong>Order Total: ${{ number_format($order->amount / 100, 2) }}</strong>
                         </p>
-                        <p class="text-dark-soft">Billed to Card #: **** **** **** 1234</p>
+                        <p class="text-dark-soft">Billed to Card #: **** **** **** {{ $order->card_last_four }}</p>
                     </div>
                 </div>
                 <div class="m-xs-b-7">

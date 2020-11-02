@@ -21,6 +21,8 @@ class ViewOrderTest extends DuskTestCase
         $concert = Concert::factory()->create();
         $order = Order::factory()->create([
             'confirmation_number' => 'FOOBAR123',
+            'amount' => '8500',
+            'card_last_four' => '4242',
         ]);
         $ticket = Ticket::factory()->create([
             'concert_id' => $concert->id,
@@ -31,5 +33,8 @@ class ViewOrderTest extends DuskTestCase
         $response = $this->get('/orders/' . $order->confirmation_number);
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewHas('order', $order);
+        $response->assertSee($order->confirmation_number);
+        $response->assertSee('$85.00');
+        $response->assertSee('**** **** **** ' . $order->card_last_four);
     }
 }
