@@ -18,6 +18,7 @@
                 </div>
                 <div class="m-xs-b-7">
                     <h2 class="text-lg wt-normal m-xs-b-4">Your Tickets</h2>
+                    @foreach($order->tickets as $ticket)
                     <div class="card m-xs-b-5">
                         <div class="card-section p-xs-y-3 flex-baseline flex-spaced text-light bg-gray">
                             <div>
@@ -67,10 +68,11 @@
                             </div>
                         </div>
                         <div class="card-section flex-baseline flex-spaced">
-                            <p class="text-lg">FOOBAR</p>
+                            <p class="text-lg">{{ $ticket->code }}</p>
                             <p>john.smith@example.com</p>
                         </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
         </div>

@@ -24,9 +24,15 @@ class ViewOrderTest extends DuskTestCase
             'amount' => '8500',
             'card_last_four' => '4242',
         ]);
-        $ticket = Ticket::factory()->create([
+        $ticketA = Ticket::factory()->create([
             'concert_id' => $concert->id,
             'order_id' => $order->id,
+            'code' => 'TICKETCODE123',
+        ]);
+        $ticketB = Ticket::factory()->create([
+            'concert_id' => $concert->id,
+            'order_id' => $order->id,
+            'code' => 'TICKETCODE456',
         ]);
 
 
@@ -36,5 +42,7 @@ class ViewOrderTest extends DuskTestCase
         $response->assertSee($order->confirmation_number);
         $response->assertSee('$85.00');
         $response->assertSee('**** **** **** ' . $order->card_last_four);
+        $response->assertSee('TICKETCODE123');
+        $response->assertSee('TICKETCODE456');
     }
 }

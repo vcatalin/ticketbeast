@@ -39,7 +39,16 @@ class OrderSeeder extends Seeder
             Ticket::factory()->create([
                 'concert_id' => $concert->id,
                 'order_id' => $order->id,
+                'code' => 'FOOBAR'
             ]);
+
+            if ($id === 'FOOBAR123') {
+                Ticket::factory()->create([
+                    'concert_id' => $concert->id,
+                    'order_id' => $order->id,
+                    'code' => 'FOOBAR'
+                ]);
+            }
         }
     }
 }

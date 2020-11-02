@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Database\Seeders;
 
 use App\Models\Concert;
+use App\Models\Ticket;
 use Illuminate\Database\Seeder;
 
 class ConcertSeeder extends Seeder
@@ -18,7 +19,10 @@ class ConcertSeeder extends Seeder
     {
         $publishedConcerts = Concert::factory()->published()->count(10)->create();
         foreach ($publishedConcerts as $concert) {
-            $concert->addTickets(10);
+            Ticket::factory()->create([
+                'concert_id' => $concert->id,
+                'code' => 'FOOBAR'
+            ]);
         }
 
         Concert::factory()->unpublished()->count(10)->create();
