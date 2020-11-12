@@ -20,7 +20,7 @@ class StripePaymentGateway implements PaymentGateway
         $this->stripeClient = $stripeClient;
     }
 
-    public function charge(int $amount, string $token): void
+    public function charge(int $amount, string $token)
     {
         try {
             $this->stripeClient->charges->create([

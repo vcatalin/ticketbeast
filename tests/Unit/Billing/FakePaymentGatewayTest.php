@@ -17,8 +17,6 @@ class FakePaymentGatewayTest extends TestCase
         return new FakePaymentGateway();
     }
 
-
-
     /** @test */
     public function running_a_hook_before_the_first_charge(): void
     {

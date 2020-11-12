@@ -13,7 +13,7 @@ interface PaymentGateway
     /**
      * @throws PaymentFailedException
      */
-    public function charge(int $amount, string $token): void;
+    public function charge(int $amount, string $token);
     public function getValidTestToken(): string;
     public function newChargesDuring(Closure $param): Collection;
 }
