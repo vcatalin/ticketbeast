@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Billing\FakePaymentGateway;
 use App\Billing\PaymentGateway;
 use App\Models\Concert;
+use App\OrderConfirmationNumberGenerator;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,6 +36,12 @@ class PurchaseTicketsTest extends TestCase
         /** @var Concert $concert */
         $concert = Concert::factory()->published()->create()->addTickets($ticketQuantity);
 
+        $orderConfirmationNumberGenerator = \Mockery::mock(OrderConfirmationNumberGenerator::class, [
+            'generate' => 'ORDERCONFIRMATION1234',
+        ]);
+
+        $this->app->instance(OrderConfirmationNumberGenerator::class, $orderConfirmationNumberGenerator);
+
         $response = $this->json('POST', "/concerts/{$concert->id}/orders", [
             'email' => self::CUSTOMER_EMAIL,
             'ticket_quantity' => $ticketQuantity,
@@ -48,6 +55,7 @@ class PurchaseTicketsTest extends TestCase
             'email' => self::CUSTOMER_EMAIL,
             'ticket_quantity' => $ticketQuantity,
             'amount' => $totalPrice,
+            'confirmation_number' => "ORDERCONFIRMATION1234",
         ]);
         $this->assertEquals($totalPrice, $this->paymentGateway->totalCharges());
         $this->assertTrue($concert->hasOrderFor(self::CUSTOMER_EMAIL));
