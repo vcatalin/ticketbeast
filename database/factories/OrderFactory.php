@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Facades\OrderConfirmationNumber;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -24,6 +25,8 @@ class OrderFactory extends Factory
         return [
             'amount' => 6500,
             'email' => 'john@example.com',
+            'confirmation_number' => 'ORDERCONFIRMATION1234',
+            'card_last_four' => '1234',
         ];
     }
 }
