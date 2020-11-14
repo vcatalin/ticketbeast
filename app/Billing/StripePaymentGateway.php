@@ -13,6 +13,8 @@ use Stripe\StripeClientInterface;
 
 class StripePaymentGateway implements PaymentGateway
 {
+    public const TEST_CARD = '5200828282828210';
+
     private StripeClientInterface $stripeClient;
 
     public function __construct(StripeClientInterface $stripeClient)
@@ -39,12 +41,12 @@ class StripePaymentGateway implements PaymentGateway
         }
     }
 
-    public function getValidTestToken(): string
+    public function getValidTestToken(string $cardNumber = self::TEST_CARD): string
     {
         return $this->stripeClient->tokens->create(
             [
                 'card' => [
-                    'number' => '4242424242424242',
+                    'number' => $cardNumber,
                     'exp_month' => 1,
                     'exp_year' => date('Y') + 1,
                     'cvc' => '123',
