@@ -7,7 +7,7 @@ namespace App\Billing;
 use App\Billing\Exceptions\PaymentFailedException;
 use Closure;
 use Illuminate\Support\Collection;
-use Stripe\Charge;
+use Stripe\Charge as StripeCharge;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\StripeClientInterface;
 
@@ -20,13 +20,19 @@ class StripePaymentGateway implements PaymentGateway
         $this->stripeClient = $stripeClient;
     }
 
-    public function charge(int $amount, string $token)
+    public function charge(int $amount, string $token): Charge
     {
         try {
-            $this->stripeClient->charges->create([
+            /** @var StripeCharge $stripeCharge */
+            $stripeCharge = $this->stripeClient->charges->create([
                 'amount' => $amount,
                 'currency' => 'usd',
                 'source' => $token,
+            ]);
+
+            return new Charge([
+                'amount' => $stripeCharge->amount,
+                'card_last_four' => $stripeCharge->payment_method_details->card->last4,
             ]);
         } catch (InvalidRequestException $exception) {
             throw new PaymentFailedException();
@@ -51,15 +57,21 @@ class StripePaymentGateway implements PaymentGateway
     {
         $latestCharge = $this->lastCharge();
         $callback();
-        return $this->newChargesSince($latestCharge)->pluck('amount');
+        return $this->newChargesSince($latestCharge)->map(function ($stripeCharge) {
+            return new Charge([
+                    'amount' => $stripeCharge->amount,
+                    'card_last_four' => $stripeCharge->payment_method_details->card->last4,
+                ]
+            );
+        });
     }
 
-    private function lastCharge(): Charge
+    private function lastCharge(): StripeCharge
     {
         return $this->stripeClient->charges->all(['limit' => 1])['data'][0];
     }
 
-    private function newChargesSince(?Charge $charge): Collection
+    private function newChargesSince(?StripeCharge $charge): Collection
     {
         $newCharges = $this->stripeClient->charges->all(
             [

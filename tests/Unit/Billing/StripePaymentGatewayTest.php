@@ -40,6 +40,6 @@ class StripePaymentGatewayTest extends TestCase
         });
 
         $this->assertCount(1, $newCharges);
-        $this->assertEquals(1515, $newCharges->sum());
+        $this->assertEquals(1515, $newCharges->map->amount()->sum());
     }
 }
