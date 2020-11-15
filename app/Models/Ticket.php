@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Facades\TicketCode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,6 +33,12 @@ class Ticket extends Model
     public function release(): void
     {
         $this->update(['reserved_at' => null]);
+    }
+
+    public function claimFor(Order $order): void
+    {
+        $this->code = TicketCode::generate();
+        $order->tickets()->save($this);
     }
 
     public function getPriceAttribute(): int

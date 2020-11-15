@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Billing\FakePaymentGateway;
 use App\Billing\PaymentGateway;
+use App\Facades\OrderConfirmationNumber;
 use App\Models\Concert;
 use App\OrderConfirmationNumberGenerator;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -36,11 +37,7 @@ class PurchaseTicketsTest extends TestCase
         /** @var Concert $concert */
         $concert = Concert::factory()->published()->create()->addTickets($ticketQuantity);
 
-        $orderConfirmationNumberGenerator = \Mockery::mock(OrderConfirmationNumberGenerator::class, [
-            'generate' => 'ORDERCONFIRMATION1234',
-        ]);
-
-        $this->app->instance(OrderConfirmationNumberGenerator::class, $orderConfirmationNumberGenerator);
+        OrderConfirmationNumber::shouldReceive('generate')->andReturn('ORDERCONFIRMATION1234');
 
         $response = $this->json('POST', "/concerts/{$concert->id}/orders", [
             'email' => self::CUSTOMER_EMAIL,
@@ -53,9 +50,13 @@ class PurchaseTicketsTest extends TestCase
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJsonFragment([
             'email' => self::CUSTOMER_EMAIL,
-            'ticket_quantity' => $ticketQuantity,
             'amount' => $totalPrice,
             'confirmation_number' => "ORDERCONFIRMATION1234",
+            'tickets' => [
+                ['code' => 'TICKETCODE1'],
+                ['code' => 'TICKETCODE2'],
+                ['code' => 'TICKETCODE3'],
+            ],
         ]);
         $this->assertEquals($totalPrice, $this->paymentGateway->totalCharges());
         $this->assertTrue($concert->hasOrderFor(self::CUSTOMER_EMAIL));
