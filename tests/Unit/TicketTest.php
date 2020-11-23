@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Facades\TicketCode;
-use App\Models\Concert;
 use App\Models\Order;
 use App\Models\Ticket;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class TicketTest extends TestCase
@@ -42,18 +40,17 @@ class TicketTest extends TestCase
     /** @test */
     public function a_ticket_can_be_claimed_for_an_order(): void
     {
+        /** @var Order $order */
         $order = Order::factory()->create();
+        /** @var Ticket $ticket */
         $ticket = Ticket::factory()->create([
             'code' => null
         ]);
-
-        TicketCode::shouldReceive('generate')->andReturn('TICKETCODE1');
+        TicketCode::shouldReceive('generateFor')->with($ticket)->andReturn('TICKETCODE1');
 
         $ticket->claimFor($order);
 
-        // Assert that the ticket is saved to the order
         $this->assertContains($ticket->id, $order->tickets->pluck('id'));
-        // Assert that the ticket had the expected ticket code generated
         $this->assertEquals('TICKETCODE1', $ticket->code);
     }
 }
