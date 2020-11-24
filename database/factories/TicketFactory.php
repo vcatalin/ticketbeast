@@ -26,7 +26,8 @@ class TicketFactory extends Factory
         return [
             'concert_id' => function () {
                 return Concert::factory()->published()->create()->id;
-            }
+            },
+            'code' => null,
         ];
     }
 

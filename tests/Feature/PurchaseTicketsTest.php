@@ -7,8 +7,8 @@ namespace Tests\Feature;
 use App\Billing\FakePaymentGateway;
 use App\Billing\PaymentGateway;
 use App\Facades\OrderConfirmationNumber;
+use App\Facades\TicketCode;
 use App\Models\Concert;
-use App\OrderConfirmationNumberGenerator;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,12 +32,18 @@ class PurchaseTicketsTest extends TestCase
     /** @test */
     public function can_purchase_published_concerts(): void
     {
+        $this->disableExceptionHandling();
         $ticketQuantity = 3;
 
         /** @var Concert $concert */
         $concert = Concert::factory()->published()->create()->addTickets($ticketQuantity);
 
         OrderConfirmationNumber::shouldReceive('generate')->andReturn('ORDERCONFIRMATION1234');
+        TicketCode::shouldReceive('generateFor')->andReturn(
+            'TICKETCODE1',
+            'TICKETCODE2',
+            'TICKETCODE3'
+        );
 
         $response = $this->json('POST', "/concerts/{$concert->id}/orders", [
             'email' => self::CUSTOMER_EMAIL,

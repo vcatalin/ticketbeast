@@ -288,10 +288,6 @@ export default {
         purchaseTickets(token) {
             this.processing = true;
 
-            console.log("Email: " + this.email);
-            console.log("Quantity: " + this.quantity);
-            console.log("TokenId: " + token.id);
-
             axios
                 .post(`/concerts/${this.concertId}/orders`, {
                     email: this.email,
@@ -299,8 +295,7 @@ export default {
                     payment_token: token.id
                 })
                 .then(response => {
-                    // window.location = `/orders/${response.data.confirmation_number}`;
-                    console.log("Charge succeeded!");
+                    window.location = `/orders/${response.data.confirmation_number}`;
                 })
                 .catch(response => {
                     this.processing = false;

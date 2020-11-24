@@ -21,7 +21,7 @@ class ConcertSeeder extends Seeder
         foreach ($publishedConcerts as $concert) {
             Ticket::factory()->create([
                 'concert_id' => $concert->id,
-                'code' => 'FOOBAR'
+                'code' => null,
             ]);
         }
 
