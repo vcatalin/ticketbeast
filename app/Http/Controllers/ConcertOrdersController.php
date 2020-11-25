@@ -7,9 +7,11 @@ namespace App\Http\Controllers;
 use App\Billing\Exceptions\NotEnoughTicketsException;
 use App\Billing\Exceptions\PaymentFailedException;
 use App\Billing\PaymentGateway;
+use App\Mail\OrderConfirmationEmail;
 use App\Models\Concert;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -36,6 +38,7 @@ class ConcertOrdersController extends Controller
         try {
             $reservation = $concert->reserveTickets($ticketQuantity, $email);
             $order = $reservation->complete($paymentGateway, $paymentToken);
+            Mail::to($order->email)->send(new OrderConfirmationEmail($order));
 
             return new JsonResponse($order, Response::HTTP_CREATED);
         } catch (PaymentFailedException $e) {

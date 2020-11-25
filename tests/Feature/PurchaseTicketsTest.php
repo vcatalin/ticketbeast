@@ -8,8 +8,10 @@ use App\Billing\FakePaymentGateway;
 use App\Billing\PaymentGateway;
 use App\Facades\OrderConfirmationNumber;
 use App\Facades\TicketCode;
+use App\Mail\OrderConfirmationEmail;
 use App\Models\Concert;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
@@ -34,6 +36,8 @@ class PurchaseTicketsTest extends TestCase
     {
         $this->disableExceptionHandling();
         $ticketQuantity = 3;
+
+        Mail::fake();
 
         /** @var Concert $concert */
         $concert = Concert::factory()->published()->create()->addTickets($ticketQuantity);
@@ -66,10 +70,16 @@ class PurchaseTicketsTest extends TestCase
         ]);
         $this->assertEquals($totalPrice, $this->paymentGateway->totalCharges());
         $this->assertTrue($concert->hasOrderFor(self::CUSTOMER_EMAIL));
+        $order = $concert->ordersFor(self::CUSTOMER_EMAIL)->first();
         $this->assertEquals(
             $ticketQuantity,
-            $concert->ordersFor(self::CUSTOMER_EMAIL)->first()->ticketQuantity(),
+            $order->ticketQuantity(),
         );
+
+        Mail::assertSent(OrderConfirmationEmail::class, function (OrderConfirmationEmail $email) use ($order) {
+            return $email->hasTo('john@example.com')
+                && $email->order->id === $order->id;
+        });
     }
 
     /** @test */
