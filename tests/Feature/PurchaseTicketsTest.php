@@ -29,15 +29,13 @@ class PurchaseTicketsTest extends TestCase
         parent::setUp();
         $this->paymentGateway = new FakePaymentGateway();
         $this->app->instance(PaymentGateway::class, $this->paymentGateway);
+        Mail::fake();
     }
 
     /** @test */
     public function can_purchase_published_concerts(): void
     {
-        $this->disableExceptionHandling();
         $ticketQuantity = 3;
-
-        Mail::fake();
 
         /** @var Concert $concert */
         $concert = Concert::factory()->published()->create()->addTickets($ticketQuantity);
