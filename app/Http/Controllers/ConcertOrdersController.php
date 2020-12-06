@@ -31,7 +31,7 @@ class ConcertOrdersController extends Controller
             'payment_token' => 'required|string',
         ]);
 
-        $ticketQuantity = $request->input('ticket_quantity');
+        $ticketQuantity = (int) $request->input('ticket_quantity');
         $email = $request->input('email');
         $paymentToken = $request->input('payment_token');
 
