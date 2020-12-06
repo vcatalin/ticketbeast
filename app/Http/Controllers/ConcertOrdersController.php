@@ -19,11 +19,11 @@ class ConcertOrdersController extends Controller
 {
     public function store(
         Request $request,
-        int $concertId,
+        string $concertId,
         PaymentGateway $paymentGateway
     ): JsonResponse {
         /** @var Concert $concert */
-        $concert = Concert::published()->findOrFail($concertId);
+        $concert = Concert::published()->findOrFail((int) $concertId);
 
         $request->validate([
             'email' => 'required|email',

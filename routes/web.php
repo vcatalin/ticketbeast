@@ -14,8 +14,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/orders/{confirmationNumber}', 'OrdersController@show');
-Route::get('/concerts/{id}', 'ConcertsController@show');
-Route::post('/concerts/{id}/orders', 'ConcertOrdersController@store');
+Route::get('/concerts/{concertId}', 'ConcertsController@show');
+Route::post('/concerts/{concertId}/orders', 'ConcertOrdersController@store');
 
-Route::post('/login', 'Auth\LoginController@login');
-Route::get('/login', 'Auth\LoginController@showLoginForm');
+Route::post('/login', 'Auth\LoginController@login')->name('auth.login');
+Route::post('/logout', 'Auth\LoginController@logout')->name('auth.logout');
+Route::get('/login', 'Auth\LoginController@showLoginForm')->name('auth.show');
+

@@ -10,15 +10,13 @@ use Throwable;
 
 abstract class TestCase extends BaseTestCase
 {
+    use CreatesApplication;
+
     protected function setUp(): void
     {
         parent::setUp();
         Mockery::getConfiguration()->allowMockingNonExistentMethods(false);
     }
-
-    use CreatesApplication;
-
-
 
     public function disableExceptionHandling(): void
     {

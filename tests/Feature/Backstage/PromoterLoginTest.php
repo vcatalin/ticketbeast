@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Tests\Feature\Backstage;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -29,7 +29,7 @@ class PromoterLoginTest extends TestCase
                 'password' => 'super-secret-password',
             ]
         );
-        $response->assertRedirect('/backstage/concerts');
+        $response->assertRedirect('/backstage/concerts/new');
 
         $this->assertTrue(Auth::check());
         $this->assertTrue(Auth::user()->is($user));
@@ -38,6 +38,7 @@ class PromoterLoginTest extends TestCase
     /** @test */
     public function logging_in_with_invalid_credentials(): void
     {
+        $this->disableExceptionHandling();
         $user = User::factory()->create([
             'email' => 'jane@example.com',
             'password' => bcrypt('super-secret-password'),
@@ -52,7 +53,7 @@ class PromoterLoginTest extends TestCase
             ]
         );
         $response->assertRedirect('/login');
-        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors('email');
 
         $this->assertFalse(Auth::check());
     }
@@ -71,6 +72,18 @@ class PromoterLoginTest extends TestCase
         $response->assertRedirect('/login');
         $response->assertSessionHasErrors();
 
+        $this->assertFalse(Auth::check());
+    }
+
+    /** @test */
+    public function logging_out_the_current_user(): void
+    {
+        $this->disableExceptionHandling();
+        Auth::login(User::factory()->create());
+
+        $response = $this->post('/logout');
+
+        $response->assertRedirect('/login');
         $this->assertFalse(Auth::check());
     }
 }
