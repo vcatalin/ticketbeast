@@ -23,8 +23,10 @@ class LoginController extends Controller
         ];
 
         if (!Auth::attempt($credentials)) {
-            return redirect('/login')->withErrors([
-                'email' => ['These credentials do not match our records.'],
+            return redirect('/login')
+                ->withInput(['email' => $request->input('email')])
+                ->withErrors([
+                    'email' => ['These credentials do not match our records.'],
             ]);
         }
 

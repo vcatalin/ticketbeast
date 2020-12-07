@@ -54,6 +54,8 @@ class PromoterLoginTest extends TestCase
         );
         $response->assertRedirect('/login');
         $response->assertSessionHasErrors('email');
+        $this->assertTrue(session()->hasOldInput('email'));
+        $this->assertFalse(session()->hasOldInput('password'));
 
         $this->assertFalse(Auth::check());
     }
