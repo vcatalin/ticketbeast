@@ -40,6 +40,7 @@
                 <div class="container">
                     <div class="card bg-soft">
                         <form
+                            class="stripe-form"
                             ref="form"
                             action="//httpbin.org/post"
                             method="POST"
@@ -141,13 +142,13 @@
                                     </select>
                                 </label>
                             </div>
-                            <button class="btn btn-block" type="submit">
+                            <button class="stripe-button btn btn-block" type="submit">
                                 Pay ${{ totalPriceInDollars }}
                             </button>
                         </form>
 
                         <button
-                            class="btn btn-danger-fill btn-block"
+                            class="stripe-button-cancel btn btn-block"
                             @click="showModal = false"
                             :class="{ 'btn-loading': processing }"
                             :disabled="processing"
