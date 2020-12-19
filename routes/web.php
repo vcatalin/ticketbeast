@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/orders/{confirmationNumber}', 'OrdersController@show');
-Route::get('/concerts/{concertId}', 'ConcertsController@show');
+Route::get('/concerts/{concertId}', 'ConcertsController@show')->name('concerts.show');
 Route::post('/concerts/{concertId}/orders', 'ConcertOrdersController@store');
 
 Route::post('/login', 'Auth\LoginController@login')->name('auth.login');
@@ -24,4 +24,5 @@ Route::post('/logout', 'Auth\LoginController@logout')->name('auth.logout');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/backstage/concerts/new', 'Backstage\ConcertsController@create');
+    Route::post('/backstage/concerts', 'Backstage\ConcertsController@store');
 });
