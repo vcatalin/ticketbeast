@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Backstage;
 
+use App\Http\Controllers\Backstage\Requests\StoreConcertRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Concert;
 use Illuminate\Http\RedirectResponse;
@@ -18,8 +19,11 @@ class ConcertsController extends Controller
     }
 
     public function store(
-        Request $request
+        Request $request,
+        StoreConcertRequest $storeConcertRequest
     ): RedirectResponse {
+        $validated = $storeConcertRequest->validated();
+
         /** @var Concert $concert */
         $concert = Concert::create([
             'title' => $request->input('title'),
