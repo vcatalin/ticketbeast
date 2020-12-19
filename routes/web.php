@@ -21,5 +21,7 @@ Route::post('/login', 'Auth\LoginController@login')->name('auth.login');
 Route::get('/login', 'Auth\LoginController@showLoginForm')->name('auth.show');
 Route::post('/logout', 'Auth\LoginController@logout')->name('auth.logout');
 
-Route::get('/backstage/concerts/new', 'Backstage\ConcertsController@create');
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/backstage/concerts/new', 'Backstage\ConcertsController@create');
+});

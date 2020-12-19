@@ -68,13 +68,13 @@
                         <div class="card">
                             <div class="card-section">
                                 <div class="row">
-                                    <div class="col-col-md-6">
+                                    <div class="col col-md-6">
                                         <div class="form-group {{ $errors->first('date', 'has-error') }}">
                                             <label for="date" class="form-label">Date</label>
                                             <input type="date" name="date" class="form-control" placeholder="yyyy-mm-dd" value="{{ old('date') }}">
                                         </div>
                                     </div>
-                                    <div class="col-col-md-6">
+                                    <div class="col col-md-6">
                                         <div class="form-group {{ $errors->first('time', 'has-error') }}">
                                             <label for="time" class="form-label">Start Time</label>
                                             <input name="time" class="form-control" placeholder="7:00pm" value="{{ old('time') }}">
