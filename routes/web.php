@@ -18,8 +18,8 @@ Route::get('/concerts/{concertId}', 'ConcertsController@show');
 Route::post('/concerts/{concertId}/orders', 'ConcertOrdersController@store');
 
 Route::post('/login', 'Auth\LoginController@login')->name('auth.login');
-Route::post('/logout', 'Auth\LoginController@logout')->name('auth.logout');
 Route::get('/login', 'Auth\LoginController@showLoginForm')->name('auth.show');
+Route::post('/logout', 'Auth\LoginController@logout')->name('auth.logout');
 
 Route::get('/backstage/concerts/new', 'Backstage\ConcertsController@create');
 
