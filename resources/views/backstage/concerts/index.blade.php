@@ -1,0 +1,1 @@
+{{-- Finish index view implementation --}}

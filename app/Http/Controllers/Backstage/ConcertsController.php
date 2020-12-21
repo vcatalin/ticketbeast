@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class ConcertsController extends Controller
 {
@@ -51,5 +52,17 @@ class ConcertsController extends Controller
     public function index()
     {
         return view('backstage.concerts.index', ['concerts' => Auth::user()->concerts]);
+    }
+
+    public function edit(int $concertId)
+    {
+        /** @var Concert $concert */
+        $concert = Auth::user()->concerts()->findOrFail($concertId);
+
+        abort_if($concert->isPublished(), Response::HTTP_FORBIDDEN);
+
+        return view('backstage.concerts.edit', [
+            'concert' => $concert
+        ]);
     }
 }
