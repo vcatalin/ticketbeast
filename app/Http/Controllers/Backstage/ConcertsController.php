@@ -10,6 +10,7 @@ use App\Models\Concert;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ConcertsController extends Controller
 {
@@ -25,7 +26,7 @@ class ConcertsController extends Controller
         $validated = $storeConcertRequest->validated();
 
         /** @var Concert $concert */
-        $concert = Concert::create([
+        $concert = Auth::user()->concerts()->create([
             'title' => $request->input('title'),
             'subtitle' => $request->input('subtitle'),
             'date' => Carbon::parse(vsprintf('%s %s', [

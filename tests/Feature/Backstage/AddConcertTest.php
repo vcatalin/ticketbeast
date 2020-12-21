@@ -28,7 +28,7 @@ class AddConcertTest extends TestCase
     /** @test */
     public function guests_can_not_view_the_concert_form(): void
     {
-        $response = $this->get('backstage/concerts/new');
+        $response = $this->get('/backstage/concerts/new');
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect('/login');
@@ -47,6 +47,7 @@ class AddConcertTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect("/concerts/{$concert->id}");
 
+        $this->assertTrue($concert->user->is($user));
         $this->assertEquals('No Warning', $concert->title);
         $this->assertEquals('with Cruel Hand and Backtrack', $concert->subtitle);
         $this->assertEquals('You must be 19 years of age to attend this concert.', $concert->additional_information);
@@ -86,6 +87,7 @@ class AddConcertTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect("/concerts/{$concert->id}");
 
+        $this->assertTrue($concert->user->is($user));
         $this->assertNull($concert->subtitle);
     }
 
@@ -105,6 +107,7 @@ class AddConcertTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect("/concerts/{$concert->id}");
 
+        $this->assertTrue($concert->user->is($user));
         $this->assertNull($concert->additional_information);
     }
 
