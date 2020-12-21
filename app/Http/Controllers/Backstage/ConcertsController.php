@@ -47,4 +47,9 @@ class ConcertsController extends Controller
 
         return redirect()->route('concerts.show', ['concertId' => $concert->id]);
     }
+
+    public function index()
+    {
+        return view('backstage.concerts.index', ['concerts' => Auth::user()->concerts]);
+    }
 }
