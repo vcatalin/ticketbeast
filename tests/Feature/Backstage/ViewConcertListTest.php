@@ -6,13 +6,34 @@ namespace Tests\Feature\Backstage;
 
 use App\Models\Concert;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Testing\TestResponse;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class ViewConcertListTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        TestResponse::macro('data', function (string $key) {
+            return $this->original->getData()[$key];
+        });
+
+        Collection::macro('assertContains', function ($value) {
+            Assert::assertTrue($this->contains($value), 'Failed asserting that the collection contained the specified value.');
+        });
+
+        Collection::macro('assertNotContains', function ($value) {
+            Assert::assertFalse($this->contains($value), 'Failed asserting that the collection did not contain the specified value.');
+        });
+    }
+
     use DatabaseMigrations;
+
+
 
     /** @test */
     public function guests_can_not_view_a_promoters_concert_list(): void
@@ -35,11 +56,11 @@ class ViewConcertListTest extends TestCase
 
         $response = $this->actingAs($user)->get('/backstage/concerts');
 
-        $response->assertStatus(Response::HTTP_OK);
 
-        $this->assertTrue($response->original->getData()['concerts']->contains($concertA));
-        $this->assertTrue($response->original->getData()['concerts']->contains($concertB));
-        $this->assertTrue($response->original->getData()['concerts']->contains($concertD));
-        $this->assertFalse($response->original->getData()['concerts']->contains($concertC));
+        $response->assertStatus(Response::HTTP_OK);
+        $response->data('concerts')->assertContains($concertA);
+        $response->data('concerts')->assertContains($concertB);
+        $response->data('concerts')->assertContains($concertD);
+        $response->data('concerts')->assertNotContains($concertC);
     }
 }
