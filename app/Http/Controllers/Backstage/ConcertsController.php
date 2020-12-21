@@ -23,6 +23,7 @@ class ConcertsController extends Controller
         Request $request,
         StoreConcertRequest $storeConcertRequest
     ): RedirectResponse {
+        // TODO: Refactor $concert to DTO
         $validated = $storeConcertRequest->validated();
 
         /** @var Concert $concert */
@@ -41,6 +42,8 @@ class ConcertsController extends Controller
             'zip' => $request->input('zip'),
             'additional_information' => $request->input('additional_information'),
         ])->addTickets((int) $request->input('ticket_quantity'));
+
+        $concert->publish();
 
         return redirect()->route('concerts.show', ['concertId' => $concert->id]);
     }
