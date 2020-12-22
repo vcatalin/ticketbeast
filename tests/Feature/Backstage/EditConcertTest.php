@@ -7,19 +7,26 @@ namespace Tests\Feature\Backstage;
 use App\Models\Concert;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
-// TODO All tests need to run green
 class EditConcertTest extends TestCase
 {
     use DatabaseMigrations;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        TestResponse::macro('data', function (string $key) {
+            return $this->original->getData()[$key];
+        });
+    }
+
     /** @test */
     public function promoters_can_view_the_edit_form_for_their_own_unpublished_concerts(): void
     {
-        $this->disableExceptionHandling();
-
         $user = User::factory()->create();
         /** @var Concert $concert */
         $concert = Concert::factory()->create(['user_id' => $user->id]);
@@ -59,7 +66,7 @@ class EditConcertTest extends TestCase
     }
 
     /** @test */
-    public function promoters_see_a404_when_attempting_to_view_the_edit_form_for_a_concert_that_does_not_exist(): void
+    public function promoters_see_a_404_when_attempting_to_view_the_edit_form_for_a_concert_that_does_not_exist(): void
     {
         $user = User::factory()->create();
 

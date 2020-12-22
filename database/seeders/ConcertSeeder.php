@@ -17,7 +17,7 @@ class ConcertSeeder extends Seeder
      */
     public function run()
     {
-        $publishedConcerts = Concert::factory()->published()->count(10)->create();
+        $publishedConcerts = Concert::factory()->published()->count(6)->create(['user_id' => 1]);
         foreach ($publishedConcerts as $concert) {
             Ticket::factory()->create([
                 'concert_id' => $concert->id,
@@ -25,6 +25,13 @@ class ConcertSeeder extends Seeder
             ]);
         }
 
-        Concert::factory()->unpublished()->count(10)->create();
+        $unpublishedConcerts = Concert::factory()->unpublished()->count(5)->create(['user_id' => 1]);
+        foreach ($unpublishedConcerts as $concert) {
+            Ticket::factory()->create([
+                'concert_id' => $concert->id,
+                'code' => null,
+            ]);
+        }
+
     }
 }

@@ -15,6 +15,8 @@ use Tests\TestCase;
 
 class ViewConcertListTest extends TestCase
 {
+    use DatabaseMigrations;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -30,10 +32,6 @@ class ViewConcertListTest extends TestCase
             Assert::assertFalse($this->contains($value), 'Failed asserting that the collection did not contain the specified value.');
         });
     }
-
-    use DatabaseMigrations;
-
-
 
     /** @test */
     public function guests_can_not_view_a_promoters_concert_list(): void
@@ -55,7 +53,6 @@ class ViewConcertListTest extends TestCase
         $concertD = Concert::factory()->create(['user_id' => $user->id]);
 
         $response = $this->actingAs($user)->get('/backstage/concerts');
-
 
         $response->assertStatus(Response::HTTP_OK);
         $response->data('concerts')->assertContains($concertA);

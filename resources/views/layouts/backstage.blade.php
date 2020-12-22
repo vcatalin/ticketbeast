@@ -10,7 +10,7 @@
                             <img src="/img/logo.svg" alt="TicketBeast" style="height: 2.5rem;">
                         </div>
                         <div>
-                            <a href="#" class="link link-light m-xs-r-6">
+                            <a href="{{ route('backstage.concerts.index') }}" class="link link-light m-xs-r-6">
                                 Your Concerts
                             </a>
                             <form class="inline-block" action="{{ route('auth.logout') }}" method="POST">
