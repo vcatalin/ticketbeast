@@ -30,7 +30,7 @@ class LoginController extends Controller
             ]);
         }
 
-        return redirect('/backstage/concerts/new');
+        return redirect('/backstage/concerts');
     }
 
     public function logout()

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Backstage;
 
 use App\Http\Controllers\Backstage\Requests\StoreConcertRequest;
+use App\Http\Controllers\Backstage\Requests\UpdateConcertRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Concert;
 use Illuminate\Http\RedirectResponse;
@@ -21,28 +22,27 @@ class ConcertsController extends Controller
     }
 
     public function store(
-        Request $request,
-        StoreConcertRequest $storeConcertRequest
+        StoreConcertRequest $concertRequest
     ): RedirectResponse {
         // TODO: Refactor $concert to DTO
-        $validated = $storeConcertRequest->validated();
+        $validated = $concertRequest->validationData();
 
         /** @var Concert $concert */
         $concert = Auth::user()->concerts()->create([
-            'title' => $request->input('title'),
-            'subtitle' => $request->input('subtitle'),
+            'title' => $validated['title'],
+            'subtitle' => $validated['subtitle'],
             'date' => Carbon::parse(vsprintf('%s %s', [
-                $request->input('date'),
-                $request->input('time')
+                $validated['date'],
+                $validated['time'],
             ])),
-            'ticket_price' => $request->input('ticket_price') * 100,
-            'venue' => $request->input('venue'),
-            'venue_address' => $request->input('venue_address'),
-            'city' => $request->input('city'),
-            'state' => $request->input('state'),
-            'zip' => $request->input('zip'),
-            'additional_information' => $request->input('additional_information'),
-        ])->addTickets((int) $request->input('ticket_quantity'));
+            'ticket_price' => $validated['ticket_price'] * 100,
+            'venue' => $validated['venue'],
+            'venue_address' => $validated['venue_address'],
+            'city' => $validated['city'],
+            'state' => $validated['state'],
+            'zip' => $validated['zip'],
+            'additional_information' => $validated['additional_information'],
+        ])->addTickets((int) $validated['ticket_quantity']);
 
         $concert->publish();
 
@@ -69,8 +69,30 @@ class ConcertsController extends Controller
         ]);
     }
 
-    public function update()
-    {
+    public function update(
+        int $concertId,
+        UpdateConcertRequest $concertRequest
+    ): RedirectResponse {
+        $validated = $concertRequest->validationData();
 
+        /** @var Concert $concert */
+        $concert = Auth::user()->concerts()->findOrFail($concertId);
+        $concert->update([
+            'title' => $validated['title'],
+            'subtitle' => $validated['subtitle'],
+            'date' => Carbon::parse(vsprintf('%s %s', [
+                $validated['date'],
+                $validated['time'],
+            ])),
+            'ticket_price' => $validated['ticket_price'] * 100,
+            'venue' => $validated['venue'],
+            'venue_address' => $validated['venue_address'],
+            'city' => $validated['city'],
+            'state' => $validated['state'],
+            'zip' => $validated['zip'],
+            'additional_information' => $validated['additional_information'],
+        ]);
+
+        return redirect()->route('backstage.concerts.index');
     }
 }

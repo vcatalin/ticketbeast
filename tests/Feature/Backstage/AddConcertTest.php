@@ -37,6 +37,7 @@ class AddConcertTest extends TestCase
     /** @test */
     public function adding_a_valid_concert(): void
     {
+        $this->disableExceptionHandling();
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post('/backstage/concerts', $this->getRequestData());

@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Backstage\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreConcertRequest extends FormRequest
+class UpdateConcertRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,15 +23,14 @@ class StoreConcertRequest extends FormRequest
     {
         return [
             'title' => 'required',
-            'date' => 'required|date',
-            'time' => 'required|date_format:g:ia',
+            'date' => 'required',
+            'time' => 'required',
             'venue' => 'required',
             'venue_address' => 'required',
             'city' => 'required',
-            'state' => 'required|alpha',
+            'state' => 'required',
             'zip' => 'required',
-            'ticket_price' => 'required|numeric|min:5',
-            'ticket_quantity' => 'required|numeric|min:1',
+            'ticket_price' => 'required',
         ];
     }
 }
