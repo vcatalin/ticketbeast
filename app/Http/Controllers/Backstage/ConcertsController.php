@@ -9,7 +9,6 @@ use App\Http\Controllers\Backstage\Requests\UpdateConcertRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Concert;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
@@ -77,6 +76,9 @@ class ConcertsController extends Controller
 
         /** @var Concert $concert */
         $concert = Auth::user()->concerts()->findOrFail($concertId);
+
+        abort_if($concert->isPublished(), Response::HTTP_FORBIDDEN);
+
         $concert->update([
             'title' => $validated['title'],
             'subtitle' => $validated['subtitle'],
