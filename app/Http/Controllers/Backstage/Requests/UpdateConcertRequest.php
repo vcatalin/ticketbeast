@@ -23,6 +23,7 @@ class UpdateConcertRequest extends FormRequest
     {
         return [
             'title' => 'required',
+            'subtitle' => 'nullable',
             'date' => 'required',
             'time' => 'required',
             'venue' => 'required',

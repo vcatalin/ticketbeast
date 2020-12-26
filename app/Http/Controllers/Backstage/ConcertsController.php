@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Backstage;
 
+use App\Http\Controllers\Backstage\Dto\UpdateConcertData;
 use App\Http\Controllers\Backstage\Requests\StoreConcertRequest;
 use App\Http\Controllers\Backstage\Requests\UpdateConcertRequest;
 use App\Http\Controllers\Controller;
@@ -70,9 +71,9 @@ class ConcertsController extends Controller
 
     public function update(
         int $concertId,
-        UpdateConcertRequest $concertRequest
+        UpdateConcertRequest $request
     ): RedirectResponse {
-        $validated = $concertRequest->validationData();
+        $validated = UpdateConcertData::fromRequest($request);
 
         /** @var Concert $concert */
         $concert = Auth::user()->concerts()->findOrFail($concertId);
@@ -80,19 +81,19 @@ class ConcertsController extends Controller
         abort_if($concert->isPublished(), Response::HTTP_FORBIDDEN);
 
         $concert->update([
-            'title' => $validated['title'],
-            'subtitle' => $validated['subtitle'],
+            'title' => $validated->title,
+            'subtitle' => $validated->subtitle,
             'date' => Carbon::parse(vsprintf('%s %s', [
-                $validated['date'],
-                $validated['time'],
+                $validated->date,
+                $validated->time,
             ])),
-            'ticket_price' => $validated['ticket_price'] * 100,
-            'venue' => $validated['venue'],
-            'venue_address' => $validated['venue_address'],
-            'city' => $validated['city'],
-            'state' => $validated['state'],
-            'zip' => $validated['zip'],
-            'additional_information' => $validated['additional_information'],
+            'ticket_price' => $validated->ticketPrice * 100,
+            'venue' => $validated->venue,
+            'venue_address' => $validated->venueAddress,
+            'city' => $validated->city,
+            'state' => $validated->state,
+            'zip' => $validated->zip,
+            'additional_information' => $validated->additionalInformation,
         ]);
 
         return redirect()->route('backstage.concerts.index');

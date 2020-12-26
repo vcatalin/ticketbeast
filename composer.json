@@ -17,6 +17,7 @@
         "hashids/hashids": "^4.0",
         "laravel/framework": "^8.0",
         "laravel/ui": "^3.0",
+        "spatie/data-transfer-object": "^2.6",
         "stripe/stripe-php": "^7.60"
     },
     "require-dev": {

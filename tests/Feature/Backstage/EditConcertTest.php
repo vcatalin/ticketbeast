@@ -100,6 +100,7 @@ class EditConcertTest extends TestCase
     /** @test */
     public function promoters_can_edit_their_own_unpublished_concerts(): void
     {
+        $this->disableExceptionHandling();
         $user = User::factory()->create();
         /** @var Concert $concert */
         $concert = Concert::factory()->create([
@@ -309,5 +310,42 @@ class EditConcertTest extends TestCase
             $this->assertEquals('00000', $concert->zip);
             $this->assertEquals(2000, $concert->ticket_price);
         });
+    }
+
+    /** @test */
+    public function title_is_required(): void
+    {
+        $user = User::factory()->create();
+        /** @var Concert $concert */
+        $concert = Concert::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->from("/backstage/{$concert->id}/edit")
+            ->patch(
+                "/backstage/concerts/{$concert->id}",
+                $this->getRequestData(['title' => ''])
+            );
+
+        $response->assertRedirect("/backstage/{$concert->id}/edit");
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertSessionHasErrors('title');
+    }
+
+    public function getRequestData(array $overrides = []): array
+    {
+        return array_merge([
+            'title' => 'No Warning',
+            'subtitle' => 'with Cruel Hand and Backtrack',
+            'additional_information' => 'You must be 19 years of age to attend this concert.',
+            'date' => '2017-11-18',
+            'time' => '8:00pm',
+            'venue' => 'The Mosh Pit',
+            'venue_address' => '123 Fake St.',
+            'city' => 'Laraville',
+            'state' => 'ON',
+            'zip' => '12345',
+            'ticket_price' => '32.50',
+            'ticket_quantity' => '75',
+        ], $overrides);
     }
 }
