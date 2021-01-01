@@ -331,6 +331,30 @@ class EditConcertTest extends TestCase
         $response->assertSessionHasErrors('title');
     }
 
+    /** @test */
+    public function subtitle_is_optional(): void
+    {
+        $user = User::factory()->create();
+        /** @var Concert $concert */
+        $concert = Concert::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->actingAs($user)
+            ->from("/backstage/{$concert->id}/edit")
+            ->patch(
+                "backstage/concerts/{$concert->id}",
+                $this->getRequestData(['subtitle' => ''])
+            );
+
+        $response->assertRedirect('/backstage/concerts');
+        $response->assertStatus(Response::HTTP_FOUND);
+
+        tap($concert->fresh(), function (Concert $concert) {
+            $this->assertNull($concert->subtitle);
+        });
+    }
+
+
+
     public function getRequestData(array $overrides = []): array
     {
         return array_merge([

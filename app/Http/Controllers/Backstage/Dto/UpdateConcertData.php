@@ -10,7 +10,7 @@ use Spatie\DataTransferObject\DataTransferObject;
 class UpdateConcertData extends DataTransferObject
 {
     public string $title;
-    public string $subtitle;
+    public ?string $subtitle;
     public string $date;
     public string $time;
     public float $ticketPrice;
@@ -19,7 +19,7 @@ class UpdateConcertData extends DataTransferObject
     public string $city;
     public string $state;
     public string $zip;
-    public string $additionalInformation;
+    public ?string $additionalInformation;
 
     public static function fromRequest(UpdateConcertRequest $request): self
     {
