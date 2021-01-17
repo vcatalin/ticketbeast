@@ -341,7 +341,7 @@ class EditConcertTest extends TestCase
         $response = $this->actingAs($user)
             ->from("/backstage/{$concert->id}/edit")
             ->patch(
-                "backstage/concerts/{$concert->id}",
+                "/backstage/concerts/{$concert->id}",
                 $this->getRequestData(['subtitle' => ''])
             );
 
@@ -353,7 +353,79 @@ class EditConcertTest extends TestCase
         });
     }
 
+    /** @test */
+    public function additional_information_is_optional(): void
+    {
+        $user = User::factory()->create();
+        /** @var Concert $concert */
+        $concert = Concert::factory()->create(['user_id' => $user->id]);
 
+        $response = $this->actingAs($user)
+            ->from("/backstage/{$concert->id}/edit")
+            ->patch(
+                "/backstage/concerts/{$concert->id}",
+                $this->getRequestData(['additional_information' => ''])
+            );
+
+        $response->assertRedirect('/backstage/concerts');
+        $response->assertStatus(Response::HTTP_FOUND);
+
+        tap($concert->fresh(), function (Concert $concert) {
+            $this->assertNull($concert->additional_information);
+        });
+    }
+
+    /** @test */
+    public function date_is_required(): void
+    {
+        $user = User::factory()->create();
+        /** @var Concert $concert */
+        $concert = Concert::factory()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::parse('2021-12-01 6:00pm'),
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from("/backstage/{$concert->id}/edit")
+            ->patch(
+                "/backstage/concerts/{$concert->id}",
+                $this->getRequestData(['date' => ''])
+            );
+
+        $response->assertRedirect("/backstage/{$concert->id}/edit");
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertSessionHasErrors('date');
+
+        tap($concert->fresh(), function (Concert $concert) {
+            $this->assertEquals(Carbon::parse('2021-12-01 6:00pm'), $concert->date);
+        });
+    }
+
+    /** @test */
+    public function time_is_required(): void
+    {
+        $user = User::factory()->create();
+        /** @var Concert $concert */
+        $concert = Concert::factory()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::parse('2021-12-01 6:00pm'),
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from("/backstage/{$concert->id}/edit")
+            ->patch(
+                "/backstage/concerts/{$concert->id}",
+                $this->getRequestData(['time' => ''])
+            );
+
+        $response->assertRedirect("/backstage/{$concert->id}/edit");
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertSessionHasErrors('time');
+
+        tap($concert->fresh(), function (Concert $concert) {
+            $this->assertEquals(Carbon::parse('2021-12-01 6:00pm'), $concert->date);
+        });
+    }
 
     public function getRequestData(array $overrides = []): array
     {

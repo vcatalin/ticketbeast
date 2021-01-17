@@ -24,14 +24,15 @@ class UpdateConcertRequest extends FormRequest
         return [
             'title' => 'required',
             'subtitle' => 'nullable',
-            'date' => 'required',
-            'time' => 'required',
+            'date' => 'required|date',
+            'time' => 'required|date_format:g:ia',
             'venue' => 'required',
             'venue_address' => 'required',
             'city' => 'required',
             'state' => 'required',
             'zip' => 'required',
             'ticket_price' => 'required',
+            'additional_information' => 'nullable',
         ];
     }
 }
