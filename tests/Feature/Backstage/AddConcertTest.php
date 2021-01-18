@@ -126,7 +126,6 @@ class AddConcertTest extends TestCase
         $response->assertRedirect('/backstage/concerts/new');
         $response->assertSessionHasErrors($error);
         $this->assertEquals(0, Concert::count());
-
     }
 
     public function getRequestData(array $overrides = []): array

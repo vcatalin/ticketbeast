@@ -34,7 +34,8 @@ class EditConcertTest extends TestCase
 
         $this->assertFalse($concert->isPublished());
 
-        $response = $this->actingAs($user)->get("/backstage/concerts/{$concert->id}/edit");
+        $response = $this->actingAs($user)
+            ->get("/backstage/concerts/{$concert->id}/edit");
 
         $response->assertStatus(Response::HTTP_OK);
         $this->assertTrue($response->data('concert')->is($concert));
@@ -49,7 +50,8 @@ class EditConcertTest extends TestCase
 
         $this->assertTrue($concert->isPublished());
 
-        $response = $this->actingAs($user)->get("/backstage/concerts/{$concert->id}/edit");
+        $response = $this->actingAs($user)
+            ->get("/backstage/concerts/{$concert->id}/edit");
 
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
@@ -61,7 +63,8 @@ class EditConcertTest extends TestCase
         $otherUser = User::factory()->create();
         $concert = Concert::factory()->create(['user_id' => $otherUser->id]);
 
-        $response = $this->actingAs($user)->get("/backstage/concerts/{$concert->id}/edit");
+        $response = $this->actingAs($user)
+            ->get("/backstage/concerts/{$concert->id}/edit");
 
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
@@ -71,7 +74,8 @@ class EditConcertTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get("/backstage/concerts/999/edit");
+        $response = $this->actingAs($user)
+            ->get("/backstage/concerts/999/edit");
 
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
@@ -79,8 +83,7 @@ class EditConcertTest extends TestCase
     /** @test */
     public function guests_are_asked_to_login_when_attempting_to_view_the_edit_form_for_any_concert(): void
     {
-        $user = User::factory()->create();
-        $concert = Concert::factory()->create(['user_id' => $user->id]);
+        $concert = Concert::factory()->create();
 
         $response = $this->get("/backstage/concerts/{$concert->id}/edit");
 
@@ -100,7 +103,6 @@ class EditConcertTest extends TestCase
     /** @test */
     public function promoters_can_edit_their_own_unpublished_concerts(): void
     {
-        $this->disableExceptionHandling();
         $user = User::factory()->create();
         /** @var Concert $concert */
         $concert = Concert::factory()->create([
@@ -120,7 +122,7 @@ class EditConcertTest extends TestCase
         $this->assertFalse($concert->isPublished());
 
         $response = $this->actingAs($user)
-            ->from("/backstage/{$concert->id}/edit")
+            ->from("/backstage/concerts/{$concert->id}/edit")
             ->patch("/backstage/concerts/{$concert->id}", [
                 'title' => 'New title',
                 'subtitle' => 'New subtitle',
@@ -174,7 +176,7 @@ class EditConcertTest extends TestCase
         $this->assertFalse($concert->isPublished());
 
         $response = $this->actingAs($user)
-            ->from("/backstage/{$concert->id}/edit")
+            ->from("/backstage/concerts/{$concert->id}/edit")
             ->patch("/backstage/concerts/{$concert->id}", [
                 'title' => 'New title',
                 'subtitle' => 'New subtitle',
@@ -227,7 +229,7 @@ class EditConcertTest extends TestCase
         $this->assertTrue($concert->isPublished());
 
         $response = $this->actingAs($user)
-            ->from("/backstage/{$concert->id}/edit")
+            ->from("/backstage/concerts/{$concert->id}/edit")
             ->patch("/backstage/concerts/{$concert->id}", [
                 'title' => 'New title',
                 'subtitle' => 'New subtitle',
@@ -261,10 +263,8 @@ class EditConcertTest extends TestCase
     /** @test */
     public function guests_can_not_edit_concerts(): void
     {
-        $user = User::factory()->create();
         /** @var Concert $concert */
         $concert = Concert::factory()->create([
-            'user_id' => $user->id,
             'title' => 'Old title',
             'subtitle' => 'Old subtitle',
             'additional_information' => 'Old additional information',
@@ -280,7 +280,7 @@ class EditConcertTest extends TestCase
         $this->assertFalse($concert->isPublished());
 
         $response = $this
-            ->from("/backstage/{$concert->id}/edit")
+            ->from("/backstage/concerts/{$concert->id}/edit")
             ->patch("/backstage/concerts/{$concert->id}", [
                 'title' => 'New title',
                 'subtitle' => 'New subtitle',
@@ -313,25 +313,6 @@ class EditConcertTest extends TestCase
     }
 
     /** @test */
-    public function title_is_required(): void
-    {
-        $user = User::factory()->create();
-        /** @var Concert $concert */
-        $concert = Concert::factory()->create();
-
-        $response = $this->actingAs($user)
-            ->from("/backstage/{$concert->id}/edit")
-            ->patch(
-                "/backstage/concerts/{$concert->id}",
-                $this->getRequestData(['title' => ''])
-            );
-
-        $response->assertRedirect("/backstage/{$concert->id}/edit");
-        $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertSessionHasErrors('title');
-    }
-
-    /** @test */
     public function subtitle_is_optional(): void
     {
         $user = User::factory()->create();
@@ -339,7 +320,7 @@ class EditConcertTest extends TestCase
         $concert = Concert::factory()->create(['user_id' => $user->id]);
 
         $response = $this->actingAs($user)
-            ->from("/backstage/{$concert->id}/edit")
+            ->from("/backstage/concerts/{$concert->id}/edit")
             ->patch(
                 "/backstage/concerts/{$concert->id}",
                 $this->getRequestData(['subtitle' => ''])
@@ -361,7 +342,7 @@ class EditConcertTest extends TestCase
         $concert = Concert::factory()->create(['user_id' => $user->id]);
 
         $response = $this->actingAs($user)
-            ->from("/backstage/{$concert->id}/edit")
+            ->from("/backstage/concerts/{$concert->id}/edit")
             ->patch(
                 "/backstage/concerts/{$concert->id}",
                 $this->getRequestData(['additional_information' => ''])
@@ -376,6 +357,32 @@ class EditConcertTest extends TestCase
     }
 
     /** @test */
+    public function title_is_required(): void
+    {
+        $user = User::factory()->create();
+        /** @var Concert $concert */
+        $concert = Concert::factory()->create([
+            'user_id' => $user->id,
+            'title' => 'Example Band',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch(
+                "/backstage/concerts/{$concert->id}",
+                $this->getRequestData(['title' => ''])
+            );
+
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertSessionHasErrors('title');
+
+        tap($concert->fresh(), function (Concert $concert) {
+           $this->assertEquals('Example Band', $concert->title);
+        });
+    }
+
+    /** @test */
     public function date_is_required(): void
     {
         $user = User::factory()->create();
@@ -386,15 +393,40 @@ class EditConcertTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->from("/backstage/{$concert->id}/edit")
+            ->from("/backstage/concerts/{$concert->id}/edit")
             ->patch(
                 "/backstage/concerts/{$concert->id}",
                 $this->getRequestData(['date' => ''])
             );
 
-        $response->assertRedirect("/backstage/{$concert->id}/edit");
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertSessionHasErrors('date');
+
+        tap($concert->fresh(), function (Concert $concert) {
+            $this->assertEquals(Carbon::parse('2021-12-01 6:00pm'), $concert->date);
+        });
+    }
+
+    /** @test */
+    public function date_must_be_a_valid_date_string(): void
+    {
+        $user = User::factory()->create();
+        /** @var Concert $concert */
+        $concert =  Concert::factory()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::parse('2021-12-01 6:00pm'),
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch(
+                "/backstage/concerts/{$concert->id}",
+                $this->getRequestData(['date' => 'NOT-A-VALID-DATE'])
+            );
+
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertStatus(Response::HTTP_FOUND);
 
         tap($concert->fresh(), function (Concert $concert) {
             $this->assertEquals(Carbon::parse('2021-12-01 6:00pm'), $concert->date);
@@ -412,19 +444,133 @@ class EditConcertTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->from("/backstage/{$concert->id}/edit")
+            ->from("/backstage/concerts/{$concert->id}/edit")
             ->patch(
                 "/backstage/concerts/{$concert->id}",
                 $this->getRequestData(['time' => ''])
             );
 
-        $response->assertRedirect("/backstage/{$concert->id}/edit");
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertSessionHasErrors('time');
 
         tap($concert->fresh(), function (Concert $concert) {
             $this->assertEquals(Carbon::parse('2021-12-01 6:00pm'), $concert->date);
         });
+    }
+
+    /** @test */
+    public function time_is_a_valid_time_string(): void
+    {
+        $user = User::factory()->create();
+        /** @var Concert $concert */
+        $concert = Concert::factory()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::parse('2021-12-01 6:00pm'),
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch(
+                "/backstage/concerts/{$concert->id}",
+                $this->getRequestData(['time' => 'NOT-A-VALID-TIME'])
+            );
+
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertSessionHasErrors('time');
+
+        tap($concert->fresh(), function (Concert $concert) {
+            $this->assertEquals(Carbon::parse('2021-12-01 6:00pm'), $concert->date);
+        });
+    }
+
+    /** @test */
+    public function venue_is_required(): void
+    {
+        $user = User::factory()->create();
+        /** @var Concert $concert */
+        $concert = Concert::factory()->create([
+            'user_id' => $user->id,
+            'venue' => 'The Example Theatre',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch(
+                "/backstage/concerts/{$concert->id}",
+                $this->getRequestData(['venue' => ''])
+            );
+
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertSessionHasErrors('venue');
+
+        tap($concert->fresh(), function (Concert $concert) {
+            $this->assertEquals('The Example Theatre', $concert->venue);
+        });
+    }
+
+    /** @test */
+    public function venue_address_is_required(): void
+    {
+        $user = User::factory()->create();
+        /** @var Concert $concert */
+        $concert = Concert::factory()->create([
+            'user_id' => $user->id,
+            'venue_address' => '123 Example Lane',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch(
+                "/backstage/concerts/{$concert->id}",
+                $this->getRequestData(['venue_address' => ''])
+            );
+
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertSessionHasErrors('venue_address');
+
+        tap($concert->fresh(), function (Concert $concert) {
+            $this->assertEquals('123 Example Lane', $concert->venue_address);
+        });
+    }
+
+    /** @test */
+    public function city_is_required(): void
+    {
+        // TODO implement test to check the city parameter
+    }
+
+    /** @test */
+    public function state_is_required(): void
+    {
+        // TODO implement test to check the state parameter
+    }
+
+    /** @test */
+    public function zip_is_required(): void
+    {
+        // TODO implement test to check the zip parameter
+    }
+
+    /** @test */
+    public function ticket_price_is_required(): void
+    {
+        // TODO implement test to check the price parameter
+    }
+
+    /** @test */
+    public function ticket_price_must_be_numeric(): void
+    {
+        // TODO check price to be numeric
+    }
+
+    /** @test */
+    public function ticket_price_must_be_at_least_5(): void
+    {
+        // TODO check price to be at least 5 cents
     }
 
     public function getRequestData(array $overrides = []): array
